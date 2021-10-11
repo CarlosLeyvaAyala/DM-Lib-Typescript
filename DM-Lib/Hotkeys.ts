@@ -2,12 +2,24 @@
  * Module for Hotkey related functions.
  */
 
-import { printConsole, Input, once } from "../skyrimPlatform"
+import { printConsole, Input, once, settings } from "../skyrimPlatform"
 
 export type KeyPressEvt = () => void
 export type KeyHoldEvt = (frames: number) => () => void
 export const DoNothing: KeyPressEvt = () => {}
 export const DoNothingOnHold: KeyHoldEvt = (_) => () => {}
+
+/**
+ * Gets a hotkey from some configuration file.
+ *
+ * @param pluginName Name of the plugin to get the value from.
+ * @param optionName Name of the variable that carries the value.
+ * @returns The hotkey. `-1` if invalid.
+ */
+export function ReadFromSettings(pluginName: string, optionName: string) {
+  const l = settings[pluginName][optionName]
+  return typeof l === "number" ? l : -1
+}
 
 /**
  * Listens for some Hotkey press / release / hold.

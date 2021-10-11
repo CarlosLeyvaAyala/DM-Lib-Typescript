@@ -1,4 +1,4 @@
-import { SendPapyrusEventHook, Utility } from "../skyrimPlatform"
+import { Form, Game, SendPapyrusEventHook, Utility } from "../skyrimPlatform"
 
 /**
  * Avoids a function to be executed many times at the same time.
@@ -73,4 +73,29 @@ export function ListenPapyrusEvent(eventName: string) {
     if (eventName !== c.papyrusEventName) return
     f()
   }
+}
+
+/**
+ * Gets the esp a form belongs to.
+ *
+ * @remarks
+ * This code was adapted from `GetFormIdentifier` in FileUtils.cpp
+ * in SKEE64 (RaceMenu dll); line 177.
+ *
+ * @param form
+ * @returns string
+ */
+export function GetFormEsp(form: Form | null | undefined) {
+  if (!form) return ""
+
+  const formId = form.getFormID()
+  const modIndex = formId >>> 24
+
+  if (modIndex == 0xfe) {
+    const lightIndex = (formId >>> 12) & 0xfff
+    if (lightIndex < Game.getLightModCount())
+      return Game.getLightModName(lightIndex)
+  } else return Game.getModName(modIndex)
+
+  return ""
 }

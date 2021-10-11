@@ -4,11 +4,12 @@
 import { printConsole, settings, Utility } from "../skyrimPlatform"
 
 /** How much will the console be spammed.
- * - Optimization - Meant to only output the times functions take to execute. Used for bottleneck solving.
- * - None
- * - Error - Just errors
- * - Info - Detailed info so the players can know if things are going as expected, but not enough for actual debugging.
- * - Verbose - Info meant for developers.
+ * - optimization     Meant to only output the times functions take to execute. Used for bottleneck solving.
+ *
+ * - none       No spam.
+ * - error      Just errors and stuff like that.
+ * - info       Detailed info so players can know if things are going as expected, but not enough for actual debugging.
+ * - verbose    Info meant for developers. Use it for reporting errors or unexpected behavior.
  */
 export enum LoggingLevel {
   optimization = -1,
@@ -18,6 +19,13 @@ export enum LoggingLevel {
   verbose,
 }
 
+/**
+ * Gets the logging level from some configuration file.
+ *
+ * @param pluginName Name of the plugin to get the value from.
+ * @param optionName Name of the variable that carries the value.
+ * @returns The logging level from file. `verbose` if value was invalid.
+ */
 export function ReadLoggingFromSettings(
   pluginName: string,
   optionName: string
@@ -32,8 +40,12 @@ export function ReadLoggingFromSettings(
 export type LoggingFunction = (msg: string) => void
 
 /** A function that accepts both a message, a variable and an optional function.
+ *
  * Returns the variable after logging the message.
  * If a function was passed, it will be applied to the variable before logging.
+ *
+ * Function `f` must be a function that transforms variables of the same type
+ *  of `x` to string.
  */
 export type TappedLoggingFunction = <T>(
   msg: string,
@@ -86,8 +98,14 @@ export function CreateLoggingFunction(
  * "debuggeable" at the same time.
  *
  * @example
+ * const IntToHex = (x: number) => x.toString(16)
  * const LogAndInit = TapLog(printConsole)
- * const x = LogAndInit("Value for x", 3) // -> "Value for x: 3". Meanwhile: x === 3.
+ *
+ * // "Value for x: 3". Meanwhile: x === 3.
+ * const x = LogAndInit("Value for x", 3)
+ *
+ * // "Hex: ff". Meanwhile: ff === 255
+ * const ff = LogAndInit("Hex", 255, IntToHex)
  *
  * // Don't know what the next call will yield, but we can log it to console to see it!
  * const form = LogAndInit("Found form", Game.getFormFromFile(0x3bba, "Skyrim.esm"))
