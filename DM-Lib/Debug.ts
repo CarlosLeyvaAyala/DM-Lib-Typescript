@@ -119,6 +119,8 @@ export function TapLog(f: LoggingFunction): TappedLoggingFunction {
 }
 
 /** @experimental
+ * Doesn't work right now. Maybe I need to use promises and whatnot.
+ *
  * Measures the time it takes a function to execute and logs that.
  *
  * @remarks
@@ -140,4 +142,19 @@ export function Benchmark(f: () => void, Log: LoggingFunction): () => void {
     Log(`${f.name} end time: ${t2}`)
     Log(`Execution time for ${f.name}: ${t2 - t1}`)
   }
+}
+
+/**
+ * Converts an integer to hexadecimal notation.
+ *
+ * @remarks
+ * This function has safeguards because it's intended to be used for logging.
+ *
+ * @param x
+ * @returns string
+ */
+export function IntToHex(x: number) {
+  return !x || typeof x !== "number"
+    ? "IntToHex: Undefined value"
+    : x.toString(16)
 }
