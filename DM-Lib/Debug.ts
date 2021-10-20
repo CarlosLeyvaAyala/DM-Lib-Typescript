@@ -39,7 +39,7 @@ export function ReadLoggingFromSettings(
 /** A function that accepts a message. Returns nothing. */
 export type LoggingFunction = (msg: string) => void
 
-/** A function that accepts both a message, a variable and an optional function.
+/** A function that accepts a message, a variable and an optional function.
  *
  * Returns the variable after logging the message.
  * If a function was passed, it will be applied to the variable before logging.
@@ -148,7 +148,8 @@ export function Benchmark(f: () => void, Log: LoggingFunction): () => void {
  * Converts an integer to hexadecimal notation.
  *
  * @remarks
- * This function has safeguards because it's intended to be used for logging.
+ * This function has apparently absurd safeguards because it's intended to be used for logging.\
+ * If you want a straight forward conversion, just use `x.toString(16)`.
  *
  * @param x
  * @returns string
