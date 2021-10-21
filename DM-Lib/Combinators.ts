@@ -110,5 +110,5 @@ export function Tap<K>(x: K, f: (x: K) => void) {
 export const Identity = I
 
 // Aliases for people preferring names starting in lowercase.
-// These names are more in line with skyrymPlatform naming conventions.
+// These names are more in line with skyrimPlatform naming conventions.
 export const identity = I
