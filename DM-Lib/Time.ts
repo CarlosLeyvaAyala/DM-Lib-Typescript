@@ -12,8 +12,7 @@ export type SkyrimHours = number
 /** Hours as humans use them; where 24 == 1.0 days. */
 export type HumanHours = number
 
-/**
- * Changes Skyrim hours to human hours.
+/** Changes Skyrim hours to human hours.
  *
  * @param x Skyrim hours.
  * @returns Human readable hours.
@@ -24,8 +23,7 @@ export type HumanHours = number
  */
 export const ToHumanHours = (x: SkyrimHours): HumanHours => x / gameHourRatio
 
-/**
- * Changes human hours to Skyrim hours.
+/** Changes human hours to Skyrim hours.
  *
  * @param x Human readable hours.
  * @returns Skyrim hours.
@@ -36,8 +34,7 @@ export const ToHumanHours = (x: SkyrimHours): HumanHours => x / gameHourRatio
  */
 export const ToSkyrimHours = (x: HumanHours): SkyrimHours => x * gameHourRatio
 
-/**
- * Returns in human hours how much time has passed between `Now` and some hour.
+/** Returns in human hours how much time has passed between `Now` and some hour.
  * @param then Skyrim Hour
  * @returns Human hour
  */

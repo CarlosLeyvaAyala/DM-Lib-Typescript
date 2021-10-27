@@ -136,7 +136,7 @@ export function GetFixedFormId(
 export function GetFormEspAndId(form: Form | null | undefined) {
   const esp = GetFormEsp(form)
   const id = GetFixedFormId(form, esp.type)
-  return { name: esp.name, type: esp.type, fixedFormId: id }
+  return { modName: esp.name, type: esp.type, fixedFormId: id }
 }
 
 /**
@@ -156,5 +156,5 @@ export function GetFormUniqueId(
 ): string {
   if (!form) return "Undefined form"
   const d = GetFormEspAndId(form)
-  return format(d.name, d.fixedFormId, d.type)
+  return format(d.modName, d.fixedFormId, d.type)
 }

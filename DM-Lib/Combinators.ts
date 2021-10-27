@@ -8,13 +8,7 @@
  * https://leanpub.com/javascriptallongesix/read#leanpub-auto-making-data-out-of-functions
  */
 
-/**
- * A function that turns a value from some type to other (may be the same type).
- */
-type Transform = (x: any) => any
-
-/**
- * Returns whatever it's passed to it.
+/** Returns whatever it's passed to it.
  *
  * @param x
  * @returns x
@@ -40,8 +34,7 @@ type Transform = (x: any) => any
  */
 export const I = <T>(x: T) => x
 
-/**
- * Returns a function that accepts one parameter, but ignores it and returns whatever
+/** Returns a function that accepts one parameter, but ignores it and returns whatever
  * you originally defined it with.
  *
  * @param x
@@ -81,21 +74,18 @@ export const K =
   (y: any): T =>
     x
 
-/**
- * @experimental
- * Typescript is too strict with types for this to work. Needs more experimentation.
+/** Creates a function that accepts one parameter `x`. Returns `f1(x)` if not `null`, else `f2(x)`.
  *
  * @param f1 First function to apply.
  * @param f2 Second function to apply.
- * @returns
+ * @returns `f1(x)` if not `null`, else `f2(x)`.
  */
 export const O =
-  (f1: Transform, f2: Transform) =>
-  <T>(x: T) =>
+  <T, U>(f1: (x: T) => U | null, f2: (x: T) => U) =>
+  (x: T): U =>
     f1(x) || f2(x)
 
-/**
- * Applies function `f` to `x` and returns `x`. Useful for chaining functions that return nothing.
+/** Applies function `f` to `x` and returns `x`. Useful for chaining functions that return nothing.
  *
  * @param x
  * @param f
@@ -108,7 +98,9 @@ export function Tap<K>(x: K, f: (x: K) => void) {
 
 // Aliases for actual human beings.
 export const Identity = I
+export const Alt = O
 
 // Aliases for people preferring names starting in lowercase.
 // These names are more in line with skyrimPlatform naming conventions.
 export const identity = I
+export const alt = O
