@@ -158,3 +158,12 @@ export function GetFormUniqueId(
   const d = GetFormEspAndId(form)
   return format(d.modName, d.fixedFormId, d.type)
 }
+
+/** Returns a random element from some array.
+ *
+ * @param arr Array to get the element from.
+ * @returns A random element.
+ */
+export function RandomElement<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}

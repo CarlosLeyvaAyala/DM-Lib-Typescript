@@ -81,9 +81,13 @@ export const K =
  * @returns `f1(x)` if not `null`, else `f2(x)`.
  */
 export const O =
-  <T, U>(f1: (x: T) => U | null, f2: (x: T) => U) =>
-  (x: T): U =>
-    f1(x) || f2(x)
+  <U>(f1: (...args: any[]) => U | null, f2: (...args: any[]) => U) =>
+  (...args: any[]): U =>
+    f1(...args) || f2(...args)
+// export const O =
+//   <T, U>(f1: (x: T) => U | null, f2: (x: T) => U) =>
+//   (x: T): U =>
+//     f1(x) || f2(x)
 
 /** Applies function `f` to `x` and returns `x`. Useful for chaining functions that return nothing.
  *

@@ -1,3 +1,5 @@
+import { K, Tap } from "./Combinators"
+
 /**
  * Module for debugging-related functions.
  */
@@ -117,6 +119,27 @@ export function TapLog(f: LoggingFunction): TappedLoggingFunction {
     return x
   }
 }
+
+/** Returns `x` while executing a logging function.
+ *
+ * @remarks
+ * This is useful for uncluttering logging calls when returning values from functions,
+ * but can be used to log variable assignments as well.
+ *
+ * At first this may look like it's doing the same as {@link TapLog}, but this function provides much
+ * more flexibility at the cost of doing more writing.\
+ * Both functions are useful and can be used together for great flexibilty.
+ *
+ * @param f A function that takes any number of arguments and returns `void`.
+ * @param x The value to be returned.
+ * @returns `x`
+ *
+ * @example
+ * const Msg = (s: string) => { printConsole(`This is a ${s}`) }
+ * const x = LogR(Msg("number"), 2)       // => "This is a number"; x === 2
+ * const s = LogR(Msg("string"), "noob")  // => "This is a string"; s === "noob"
+ */
+export const LogR = <T>(f: void, x: T) => Tap(x, K(f))
 
 /** @experimental
  * Doesn't work right now. Maybe I need to use promises and whatnot.
