@@ -124,7 +124,7 @@ export function GetFixedFormId(
 ) {
   if (!form || modType === ModType.unknown) return -1
   const id = form.getFormID()
-  return (modType = ModType.esp ? id & 0xffffff : id & 0xfff)
+  return modType === ModType.esp ? id & 0xffffff : id & 0xfff
 }
 
 /**
