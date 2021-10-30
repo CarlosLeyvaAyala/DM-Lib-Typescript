@@ -3,7 +3,7 @@ import { K, Tap } from "./Combinators"
 /**
  * Module for debugging-related functions.
  */
-import { printConsole, settings, Utility } from "../skyrimPlatform"
+import { printConsole, settings, Utility, writeLogs } from "../skyrimPlatform"
 
 /** How much will the console be spammed.
  * - optimization     Meant to only output the times functions take to execute. Used for bottleneck solving.
@@ -85,6 +85,32 @@ export function CreateLoggingFunction(
 
     if (currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt))
       printConsole(m)
+  }
+}
+
+export type LogFormat = (
+  currLogLvl: LoggingLevel,
+  maxLogLvl: LoggingLevel,
+  modName: string,
+  date: Date,
+  msg: string
+) => string
+
+export function CreateLoggingFunctionEx(
+  currLogLvl: LoggingLevel,
+  logAt: LoggingLevel,
+  modName: string,
+  ConsoleFmt?: LogFormat,
+  FileFmt?: LogFormat
+) {
+  return function (msg: string) {
+    const canLog =
+      currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt)
+    if (!canLog) return
+
+    const t = new Date()
+    if (ConsoleFmt) printConsole(ConsoleFmt(currLogLvl, logAt, modName, t, msg))
+    if (FileFmt) writeLogs(modName, FileFmt(currLogLvl, logAt, modName, t, msg))
   }
 }
 
