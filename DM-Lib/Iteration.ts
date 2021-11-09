@@ -1,4 +1,4 @@
-import { Cell, Form, ObjectReference } from "../skyrimPlatform"
+import { Cell, Form, ObjectReference, printConsole } from "../skyrimPlatform"
 
 // Aliases for people preferring names starting in lowercase.
 // These names are more in line with skyrymPlatform naming conventions.
@@ -26,7 +26,7 @@ export function ForEachItemR(
  * Values were taken from.
  * {@link https://www.creationkit.com/index.php?title=GetType_-_Form}
  */
-export enum FormType {
+export const enum FormType {
   ANIO = 83,
   ARMA = 102,
   AcousticSpace = 16,
@@ -172,13 +172,15 @@ export enum FormType {
  * @param f Function applied to each `Form`.
  */
 export function ForEachFormInCell(
-  cell: Cell,
+  cell: Cell | null | undefined,
   formType: FormType,
-  f: (frm: Form | null | undefined) => void
+  f: (frm: Form) => void
 ) {
+  if (!cell) return
   let i = cell.getNumRefs(formType)
   while (i > 0) {
     i--
-    f(cell.getNthRef(i, formType))
+    const frm = cell.getNthRef(i, formType)
+    if (frm) f(frm)
   }
 }
