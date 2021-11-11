@@ -22,10 +22,7 @@ export function ForEachItemR(
   }
 }
 
-/**
- * Values were taken from.
- * {@link https://www.creationkit.com/index.php?title=GetType_-_Form}
- */
+/** Values were taken from {@link https://www.creationkit.com/index.php?title=GetType_-_Form} */
 export const enum FormType {
   ANIO = 83,
   ARMA = 102,

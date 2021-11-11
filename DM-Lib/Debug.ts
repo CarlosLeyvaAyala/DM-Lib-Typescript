@@ -103,7 +103,7 @@ export function CreateLoggingFunctionEx(
   ConsoleFmt?: LogFormat,
   FileFmt?: LogFormat
 ) {
-  return function (msg: string) {
+  return function (msg: any) {
     const canLog =
       currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt)
     if (!canLog) return
