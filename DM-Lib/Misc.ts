@@ -144,7 +144,7 @@ export function GetFormEspAndId(form: Form | null | undefined) {
  *
  * @param form The `Form` to generate data for.
  * @param format The function that will be used to give format to the result of this function.
- * @returns A unique identifier based on fixed formId and esp file data.
+ * @returns A unique `string` identifier based on fixed formId and esp file data.
  *
  * @example
  * const b = Game.getFormEx(0x03003012)

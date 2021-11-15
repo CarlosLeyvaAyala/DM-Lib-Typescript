@@ -1,6 +1,6 @@
 /** This is a prototype for a standard library for Skyrim Platform. Don't use this file. */
 
-import { Utility } from "skyrimPlatform"
+import { Form, Game, Utility } from "skyrimPlatform"
 
 /** Time related functions. */
 export namespace TimeLib {
@@ -192,3 +192,11 @@ export namespace MathLib {
  * clearer.
  */
 export namespace Combinators {}
+
+export namespace Forms {
+  export function PreserveForm(frm: Form | null) {
+    if (!frm) return () => null
+    const id = frm.getFormID()
+    return () => Game.getFormEx(id)
+  }
+}
