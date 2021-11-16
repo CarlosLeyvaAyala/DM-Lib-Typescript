@@ -33,7 +33,7 @@ export function ReadLoggingFromSettings(
   optionName: string
 ): LoggingLevel {
   const l = settings[pluginName][optionName]
-  const l2 = typeof l === "string" ? l : "None"
+  const l2 = typeof l === "string" ? l.toLowerCase() : "None"
   const t = (<any>LoggingLevel)[l2]
   return t === undefined ? LoggingLevel.verbose : t
 }
