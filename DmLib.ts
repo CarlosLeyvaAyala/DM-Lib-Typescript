@@ -400,6 +400,29 @@ export namespace ArrayLib {
   }
 }
 
+export namespace MapLib {
+  /** Joins two maps, applying a function when keys collide.
+   *
+   * @param m1 First map.
+   * @param m2 Second map.
+   * @param OnExistingKey Function for solving collisions.
+   * @returns
+   */
+  export function JoinMaps<K, V>(
+    m1: Map<K, V>,
+    m2: Map<K, V> | null | undefined,
+    OnExistingKey: (v1: V, v2: V, k?: K) => V
+  ) {
+    if (!m2) return m1
+    const o = new Map<K, V>(m1)
+    m2.forEach((v2, k) => {
+      if (o.has(k)) o.set(k, OnExistingKey(o.get(k) as V, v2, k))
+      else o.set(k, v2)
+    })
+    return o
+  }
+}
+
 export namespace Misc {
   /**
    * Avoids a function to be executed many times at the same time.
@@ -620,6 +643,9 @@ export namespace DebugLib {
      * You can use this function as a guide on how a {@link LogFormat} function
      * used for {@link CreateFunction} can be made.
      *
+     * Format for https://github.com/Scarfsail/AdvancedLogViewer :\
+     *    `[{Type}] {Date} {Time}: {Message}`
+     *
      * @example
      * const LogI = CreateFunction(userLevel, Level.info, "my-mod", ConsoleFmt, FileFmt)
      * const LogV = CreateFunction(userLevel, Level.verbose, "my-mod", ConsoleFmt, FileFmt)
@@ -649,6 +675,38 @@ export namespace DebugLib {
       f?: (x: T) => string
     ) => T
 
+    /** Creates a logging function that appends some message before logging.
+     *
+     * @param f Function to wrap.
+     * @param append Message to append each time the result is called.
+     * @returns A {@link LoggingFunction}.
+     *
+     * @example
+     * const CMLL = Append(printConsole, "Kemonito: ")
+     * CMLL("Kicks")       // => "Kemonito: Kicks"
+     * CMLL("Flies!")      // => "Kemonito: Flies!"
+     * CMLL("Is love")     // => "Kemonito: Is love"
+     * CMLL("Is life")     // => "Kemonito: Is life"
+     */
+    export function Append(f: LoggingFunction, append: any): LoggingFunction {
+      return (msg: any) => {
+        f(append + msg)
+      }
+    }
+
+    /** Creates a logging function that appends some message before logging.
+     *
+     * @see {@link Append}
+     *
+     * @param f Function to wrap.
+     * @param append Message to append each time the result is called.
+     * @returns A {@link TappedFunction}.
+     */
+    export function AppendT(f: TappedFunction, append: any): TappedFunction {
+      return <T>(msg: string, x: T, fmt?: (x: T) => string) =>
+        f(append + msg, x, fmt)
+    }
+
     /** Creates a function used for logging. Said function can log to either console or to some file.
      *
      * @see {@link FileFmt}, {@link ConsoleFmt}.
@@ -674,7 +732,7 @@ export namespace DebugLib {
       modName: string,
       ConsoleFmt?: LogFormat,
       FileFmt?: LogFormat
-    ) {
+    ): LoggingFunction {
       return function (msg: any) {
         const canLog =
           currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt)
