@@ -8,6 +8,7 @@ import {
   once,
   printConsole,
   settings,
+  storage,
   Utility,
   writeLogs,
 } from "skyrimPlatform"
@@ -463,6 +464,44 @@ export namespace Misc {
       if (lastExecuted === t) return
       lastExecuted = t
       f()
+    }
+  }
+
+  /** Adapts a JContainers saving function so it can be used with {@link PreserveVar}.
+   *
+   * @param f Function to adapt.
+   * @returns A function that accepts a key and a value.
+   *
+   * @example
+   * const SaveFlt = JContainersToPreserving(JDB.solveFltSetter)
+   * const SaveInt = JContainersToPreserving(JDB.solveIntSetter)
+   */
+  export function JContainersToPreserving<T>(
+    f: (k: string, v: T, b?: boolean) => void
+  ) {
+    return (k: string, v: T) => {
+      f(k, v, true)
+    }
+  }
+
+  /** Saves a variable to both storage and wherever the `Storage` variable saves it.
+   *
+   * @param Store A function that saves a variable somewhere.
+   * @param k `string` key to identify where the variable will be saved.
+   * @returns A fuction that saves a value and returns it.
+   *
+   * @example
+   * const SaveFlt = JContainersToPreserving(JDB.solveFltSetter)
+   * const SaveInt = JContainersToPreserving(JDB.solveIntSetter)
+   * const SFloat = PreserveVar(SaveFlt, "floatKey")
+   * const SInt = PreserveVar(SaveInt, "intKey")
+   * const x = SFloat(10)   // => x === 10
+   */
+  export function PreserveVar<T>(Store: (k: string, v: T) => void, k: string) {
+    return (x: T) => {
+      storage[k] = x
+      Store(k, x)
+      return x
     }
   }
 }
