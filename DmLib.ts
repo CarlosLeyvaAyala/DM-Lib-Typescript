@@ -459,8 +459,8 @@ export namespace Misc {
    */
   export function AvoidRapidFire(f: () => void) {
     let lastExecuted = 0
-    const t = TimeLib.Now()
     return () => {
+      const t = TimeLib.Now()
       if (lastExecuted === t) return
       lastExecuted = t
       f()
