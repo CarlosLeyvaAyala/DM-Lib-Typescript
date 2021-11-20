@@ -523,6 +523,24 @@ export namespace Misc {
       f(k, v, true)
     }
   }
+  /** Adapts a PapyrusUtil saving function so it can be used with {@link PreserveVar}.
+   *
+   * @param f Function to adapt.
+   * @param obj Object to save values on. Use `null` to save globally.
+   * @returns A function that accepts a key and a value.
+   *
+   * @example
+   * const SaveFlt = PapyrusUtilToPreserving(PapyrusUtil.SetFloatValue, null)
+   * const SaveInt = PapyrusUtilToPreserving(PapyrusUtil.SetIntValue, null)
+   */
+  export function PapyrusUtilToPreserving<T>(
+    f: (obj: Form | null | undefined, k: string, v: T) => void,
+    obj: Form | null | undefined
+  ) {
+    return (k: string, v: T) => {
+      f(obj, k, v)
+    }
+  }
 
   /** Saves a variable to both storage and wherever the `Store` function saves it.
    *
@@ -545,7 +563,10 @@ export namespace Misc {
    * const SaveInt = JContainersToPreserving(JDB.solveIntSetter)
    * const SFloat = PreserveVar(SaveFlt, "floatKey")
    * const SInt = PreserveVar(SaveInt, "intKey")
-   * const x = SFloat(10)   // => x === 10
+   *
+   * // Use SFloat each time we want to make sure a value won't get lost when reloading the game.
+   * let x = SFloat(10)   // => x === 10
+   * x = SFloat(53.78)    // => x === 53.78
    */
   export function PreserveVar<T>(Store: (k: string, v: T) => void, k: string) {
     return (x: T) => {
