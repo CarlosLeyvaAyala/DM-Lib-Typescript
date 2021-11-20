@@ -1,5 +1,3 @@
-/** This is a prototype for a standard library for Skyrim Platform. Don't use this file. */
-
 import {
   Actor,
   Form,
@@ -27,10 +25,10 @@ export namespace TimeLib {
   /** Hours as humans use them; where 24 == 1.0 days. */
   export type HumanHours = number
 
-  /** Changes Skyrim hours to human hours.
+  /** Changes {@link SkyrimHours} to {@link HumanHours}.
    *
-   * @param x Skyrim hours.
-   * @returns Human readable hours.
+   * @param x Time in {@link SkyrimHours}.
+   * @returns Time in human readable hours.
    *
    * @example
    * ToHumanHours(2.0)   // => 48. Two full days
@@ -38,10 +36,13 @@ export namespace TimeLib {
    */
   export const ToHumanHours = (x: SkyrimHours): HumanHours => x / gameHourRatio
 
-  /** Changes human hours to Skyrim hours.
+  /** Converts a {@link SkyrimHours} to a `string` in {@link HumanHours} */
+  export const ToHumanHoursStr = (x: SkyrimHours) => ToHumanHours(x).toString()
+
+  /** Changes {@link HumanHours} to {@link SkyrimHours}.
    *
-   * @param x Human readable hours.
-   * @returns Skyrim hours.
+   * @param x Time in human readable hours.
+   * @returns Time in {@link SkyrimHours}.
    *
    * @example
    * ToHumanHours(48)   // => 2.0. Two full days
@@ -425,8 +426,7 @@ export namespace MapLib {
 }
 
 export namespace Misc {
-  /**
-   * Avoids a function to be executed many times at the same time.
+  /** Avoids a function to be executed many times at the same time.
    *
    * @param f The function to wrap.
    * @returns A function that will be called only once when the engine
@@ -502,6 +502,33 @@ export namespace Misc {
       storage[k] = x
       Store(k, x)
       return x
+    }
+  }
+
+  /** Returns a function that accepts a function `f` that gets executed each `seconds`.
+   *
+   * @remarks
+   * This is meant to be used as a substitute of sorts to the `OnUpdate` Papyrus event,
+   * but it doesn't check if the player has the game paused inside a menu; that's up to
+   * `f` to implement.
+   *
+   * @param seconds Seconds between checks.
+   * @returns A function that accepts a function `f`.
+   *
+   * @example
+   * const RTcalc = UpdateEach(3)
+   *
+   * on("update", () => {
+   *    RTcalc(() => { printConsole("Real time calculations") })
+   * }
+   */
+  export function UpdateEach(seconds: number) {
+    let lastUpdated = 0
+    return (f: () => void) => {
+      const t = Utility.getCurrentRealTime()
+      if (t - lastUpdated < seconds) return
+      lastUpdated = t
+      f()
     }
   }
 }
