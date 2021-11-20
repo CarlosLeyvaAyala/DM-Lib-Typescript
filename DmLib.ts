@@ -1,8 +1,11 @@
 import {
   Actor,
+  Cell,
   Form,
+  FormType,
   Game,
   Input,
+  ObjectReference,
   once,
   printConsole,
   settings,
@@ -205,8 +208,8 @@ export namespace MathLib {
  *
  * Highly recommended reading:
  *
- * https://tgdwyer.github.io/
- * https://leanpub.com/javascriptallongesix/read#leanpub-auto-making-data-out-of-functions
+ * - https://tgdwyer.github.io/
+ * - https://leanpub.com/javascriptallongesix/read#leanpub-auto-making-data-out-of-functions
  */
 export namespace Combinators {
   /** Returns whatever it's passed to it.
@@ -298,6 +301,7 @@ export namespace Combinators {
   }
 }
 
+/** Functions related to `Forms`. */
 export namespace FormLib {
   export function PreserveForm(frm: Form | null) {
     if (!frm) return () => null
@@ -310,14 +314,50 @@ export namespace FormLib {
     return () => Actor.from(f())
   }
 
-  export enum ModType {
+  /** Iterates over all items belonging to some `ObjectReference`, from last to first.
+   *
+   * @param o - The object reference to iterate over.
+   * @param f - Function applied to each item.
+   */
+  export function ForEachItemR(
+    o: ObjectReference,
+    f: (item: Form | null) => void
+  ) {
+    let i = o.getNumItems()
+    while (i > 0) {
+      i--
+      f(o.getNthForm(i))
+    }
+  }
+
+  /** Iterates over all forms of `formType` in some `cell`.
+   *
+   * @param cell Cell to search forms for.
+   * @param formType {@link FormType}
+   * @param f Function applied to each `Form`.
+   */
+  export function ForEachFormInCell(
+    cell: Cell | null | undefined,
+    formType: FormType,
+    f: (frm: Form) => void
+  ) {
+    if (!cell) return
+    let i = cell.getNumRefs(formType)
+    while (i > 0) {
+      i--
+      const frm = cell.getNthRef(i, formType)
+      if (frm) f(frm)
+    }
+  }
+
+  /** In what space is the mod loaded in? */
+  export const enum ModType {
     esp,
     esl,
     unknown,
   }
 
-  /**
-   * Gets the esp a form belongs to.
+  /** Gets the esp a form belongs to.
    *
    * @remarks
    * This code was adapted from `GetFormIdentifier` in FileUtils.cpp
@@ -342,8 +382,7 @@ export namespace FormLib {
     return nil
   }
 
-  /**
-   * Returns the relative `formId` of some `Form`.
+  /** Returns the relative `formId` of some `Form`.
    *
    * @param form The `Form` to get the relative `formId` from.
    * @param modType Does the `Form` belong to an esp or esl file?
@@ -358,8 +397,7 @@ export namespace FormLib {
     return modType === ModType.esp ? id & 0xffffff : id & 0xfff
   }
 
-  /**
-   * Returns the esp file, type and fixed formId for a `Form`.
+  /** Returns the esp file, type and fixed formId for a `Form`.
    *
    * @param form `Form` to get data from.
    * @returns An object with all data.
@@ -370,8 +408,7 @@ export namespace FormLib {
     return { modName: esp.name, type: esp.type, fixedFormId: id }
   }
 
-  /**
-   * Returns a string that can be used as an unique `Form` identifier.
+  /** Returns a string that can be used as an unique `Form` identifier.
    *
    * @param form The `Form` to generate data for.
    * @param format The function that will be used to give format to the result of this function.
@@ -391,6 +428,7 @@ export namespace FormLib {
   }
 }
 
+/** Functions related to arrays. */
 export namespace ArrayLib {
   /** Returns a random element from some array.
    *
@@ -402,6 +440,7 @@ export namespace ArrayLib {
   }
 }
 
+/** Functions related to maps. */
 export namespace MapLib {
   /** Joins two maps, applying a function when keys collide.
    *
@@ -425,6 +464,7 @@ export namespace MapLib {
   }
 }
 
+/** Miscelaneous functions that don't belong to other categories. */
 export namespace Misc {
   /** Avoids a function to be executed many times at the same time.
    *
@@ -484,7 +524,17 @@ export namespace Misc {
     }
   }
 
-  /** Saves a variable to both storage and wherever the `Storage` variable saves it.
+  /** Saves a variable to both storage and wherever the `Store` function saves it.
+   *
+   * @remarks
+   * The `storage` variable saves values across hot reloads, but not game sessions.
+   *
+   * At the time of creating this function, Skyrim Platform doesn't implement any
+   * way of saving variables to the SKSE co-save, so values aren't preserved across
+   * save game saves.
+   *
+   * This function lets us save variables using wrapped functions from either
+   * **JContainers** or **PapyursUtil**.
    *
    * @param Store A function that saves a variable somewhere.
    * @param k `string` key to identify where the variable will be saved.
@@ -533,26 +583,154 @@ export namespace Misc {
   }
 }
 
+/** Functions related to hotkeys. */
 export namespace Hotkeys {
+  /** Was copied from skyrimPlatform.ts because definitions in there are exported as a `const enum`,
+   * thus making impossible to convert a string `DxScanCode` to number.
+   *
+   * With that setup it was impossible to make {@link FromSettings} to read scan codes as strings.
+   */
+  enum DxScanCode {
+    None,
+    Escape,
+    N1,
+    N2,
+    N3,
+    N4,
+    N5,
+    N6,
+    N7,
+    N8,
+    N9,
+    N0,
+    Minus,
+    Equals,
+    Backspace,
+    Tab,
+    Q,
+    W,
+    E,
+    R,
+    T,
+    Y,
+    U,
+    I,
+    O,
+    P,
+    LeftBracket,
+    RightBracket,
+    Enter,
+    LeftControl,
+    A,
+    S,
+    D,
+    F,
+    G,
+    H,
+    J,
+    K,
+    L,
+    Semicolon,
+    Apostrophe,
+    Console,
+    LeftShift,
+    BackSlash,
+    Z,
+    X,
+    C,
+    V,
+    B,
+    N,
+    M,
+    Comma,
+    Period,
+    ForwardSlash,
+    RightShift,
+    NumMult,
+    LeftAlt,
+    Spacebar,
+    CapsLock,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    NumLock,
+    ScrollLock,
+    Num7,
+    Num8,
+    Num9,
+    NumMinus,
+    Num4,
+    Num5,
+    Num6,
+    NumPlus,
+    Num1,
+    Num2,
+    Num3,
+    Num0,
+    NumDot,
+    F11 = 87,
+    F12,
+    NumEnter = 156,
+    RightControl,
+    NumSlash = 181,
+    SysRqPtrScr = 183,
+    RightAlt,
+    Pause = 197,
+    Home = 199,
+    UpArrow,
+    PgUp,
+    LeftArrow = 203,
+    RightArrow = 205,
+    End = 207,
+    DownArrow,
+    PgDown,
+    Insert,
+    Delete,
+    LeftMouseButton = 256,
+    RightMouseButton,
+    MiddleMouseButton,
+    MouseButton3,
+    MouseButton4,
+    MouseButton5,
+    MouseButton6,
+    MouseButton7,
+    MouseWheelUp,
+    MouseWheelDown,
+  }
+
   export type KeyPressEvt = () => void
   export type KeyHoldEvt = (frames: number) => () => void
   export const DoNothing: KeyPressEvt = () => {}
   export const DoNothingOnHold: KeyHoldEvt = (_) => () => {}
 
-  /**
-   * Gets a hotkey from some configuration file.
+  /** Gets a hotkey from some configuration file.
+   *
+   * @remarks
+   * This function can read both numbers and strings defined in {@link DxScanCode}.
    *
    * @param pluginName Name of the plugin to get the value from.
    * @param optionName Name of the variable that carries the value.
    * @returns The hotkey. `-1` if invalid.
    */
-  export function ReadFromSettings(pluginName: string, optionName: string) {
+  export function FromSettings(pluginName: string, optionName: string) {
     const l = settings[pluginName][optionName]
-    return typeof l === "number" ? l : -1
+    const t =
+      typeof l === "string"
+        ? (<any>DxScanCode)[l]
+        : typeof l === "number"
+        ? l
+        : -1
+    return t === undefined ? -1 : t
   }
 
-  /**
-   * Listens for some Hotkey press / release / hold.
+  /** Listens for some Hotkey press / release / hold.
    *
    * @see {@link https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes | DXScanCodes}
    * for possible hotkey values.
@@ -628,6 +806,7 @@ export namespace Hotkeys {
   }
 }
 
+/** Useful functions for debugging. */
 export namespace DebugLib {
   export namespace Log {
     /** How much will the console be spammed.
