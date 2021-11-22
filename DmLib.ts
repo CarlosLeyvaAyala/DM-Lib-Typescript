@@ -871,6 +871,9 @@ export namespace Hotkeys {
    * But ***DON'T GENERATE functions INSIDE an `'update'` event***.
    *
    * @param hk The hotkey to listen for.
+   * @param enable If `false`, a blank function will be returned.\
+   * Use this argument when you need to listen to hotkeys only when you know some condition
+   * will be true. This will avoid wasting time doing checks that will never come true.
    *
    * @returns A function that accepts three callbacks:
    * 1. OnKeyPress
@@ -887,9 +890,14 @@ export namespace Hotkeys {
    * const DoStuff = ListenTo(76)           // Listen to num5
    * const OnlyCareForHold = ListenTo(77)   // Listen to num6
    *
+   * const specialModeEnabled = settings["mod"]["specialMode"]
+   * const SpecialOperation = ListenTo(DxScanCode.F10, specialModeEnabled)
+   *
    * on('update', () => {
    *   DoStuff(LogPress, LogRelease, LogHold)
    *   OnlyCareForHold(undefined, undefined, LogHold)
+   *
+   *   SpecialOperation(LogPress)
    *
    *   // Never generate functions inside an update event.
    *   // The following code won't work.
@@ -897,28 +905,34 @@ export namespace Hotkeys {
    *   NonWorking(LogPress, undefined, LogHold)
    * })
    */
-  export function ListenTo(hk: number) {
+  export function ListenTo(hk: number, enable: boolean = true) {
     let old = false
     let frames = 0
 
-    return (
-      OnPress: KeyPressEvt = DoNothing,
-      OnRelease: KeyPressEvt = DoNothing,
-      OnHold: KeyHoldEvt = DoNothingOnHold
-    ) => {
-      const p = Input.isKeyPressed(hk)
+    return enable
+      ? (
+          OnPress: KeyPressEvt = DoNothing,
+          OnRelease: KeyPressEvt = DoNothing,
+          OnHold: KeyHoldEvt = DoNothingOnHold
+        ) => {
+          const p = Input.isKeyPressed(hk)
 
-      if (old !== p) {
-        frames = 0
-        if (p) once("update", OnPress)
-        else once("update", OnRelease)
-      } else if (p) {
-        frames++
-        once("update", OnHold(frames))
-      }
+          if (old !== p) {
+            frames = 0
+            if (p) once("update", OnPress)
+            else once("update", OnRelease)
+          } else if (p) {
+            frames++
+            once("update", OnHold(frames))
+          }
 
-      old = p
-    }
+          old = p
+        }
+      : (
+          OnPress: KeyPressEvt = DoNothing,
+          OnRelease: KeyPressEvt = DoNothing,
+          OnHold: KeyHoldEvt = DoNothingOnHold
+        ) => {}
   }
 
   /** Not an useful function. Use it as a template. @see {@link ListenTo} */
