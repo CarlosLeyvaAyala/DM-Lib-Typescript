@@ -1,5 +1,6 @@
 import {
   Actor,
+  Armor,
   Cell,
   Form,
   FormType,
@@ -438,6 +439,14 @@ export namespace FormLib {
       i--
       f(o.getNthForm(i))
     }
+  }
+
+  export function ForEachArmorR(o: ObjectReference, f: (item: Armor) => void) {
+    ForEachItemR(o, (i) => {
+      const a = Armor.from(i)
+      if (!a) return
+      f(a)
+    })
   }
 
   /** Iterates over all forms of `formType` in some `cell`.
@@ -1136,6 +1145,52 @@ export namespace DebugLib {
       }
     }
 
+    /** Creates all functions at all logging levels with their corresponding Tapped counterparts.
+     *
+     * @param mod Mod name. This will be saved for each line.
+     * @param logLvl Current logging level for the mod.
+     * @param Console Console format.
+     * @param File File format.
+     * @returns An object with all functions.
+     */
+    export function CreateAll(
+      mod: string,
+      logLvl: Level,
+      Console?: LogFormat,
+      File?: LogFormat
+    ) {
+      const CLF = (logAt: Level) =>
+        CreateFunction(logLvl, logAt, mod, Console, File)
+
+      const O = CLF(Level.optimization)
+      const N = CLF(Level.none)
+      const E = CLF(Level.error)
+      const I = CLF(Level.info)
+      const V = CLF(Level.verbose)
+      return {
+        /** Log at special mode: optimization. */
+        Optimization: O,
+        /** Log at none level. Basically, ignore logging settings, except when using special modes. */
+        None: N,
+        /** Log at error level. */
+        Error: E,
+        /** Log at info level. */
+        Info: I,
+        /** Log at verbose level. */
+        Verbose: V,
+        /** Log at special mode: optimization. Return value. */
+        TapO: Tap(O),
+        /** Log at none level and return value. */
+        TapN: Tap(N),
+        /** Log at error level and return value. */
+        TapE: Tap(E),
+        /** Log at info level and return value. */
+        TapI: Tap(I),
+        /** Log at verbose level and return value. */
+        TapV: Tap(V),
+      }
+    }
+
     /** Makes a logging function to log a value, then returns that value.
      *
      * @param f - The logging function.
@@ -1161,8 +1216,13 @@ export namespace DebugLib {
      */
     export function Tap(f: LoggingFunction): TappedFunction {
       return function <T>(msg: string, x: T, g?: (x: T) => string): T {
-        if (g) f(`${msg}: ${g(x)}`)
-        else f(`${msg}: ${x}`)
+        if (g) {
+          if (msg) f(`${msg}: ${g(x)}`)
+          else f(g(x))
+        } else {
+          if (msg) f(`${msg}: ${x}`)
+          else f(`${x}`)
+        }
         return x
       }
     }
