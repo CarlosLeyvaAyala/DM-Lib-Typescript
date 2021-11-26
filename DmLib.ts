@@ -10,6 +10,7 @@ import {
   once,
   printConsole,
   settings,
+  SlotMask,
   storage,
   Utility,
   writeLogs,
@@ -425,6 +426,57 @@ export namespace FormLib {
     return () => Actor.from(f())
   }
 
+  /** Does something for each `Armor` an `Actor` has equipped.
+   *
+   * @param a Actor to check.
+   * @param DoSomething What to do when an equipped armor is found.
+   */
+  export function ForEachEquippedArmor(
+    a: Actor | null | undefined,
+    DoSomething: (arm: Armor) => void
+  ) {
+    if (!a) return
+    for (let i = SlotMask.Head; i < SlotMask.FX01; i *= 2) {
+      const x = Armor.from(a.getWornForm(i))
+      if (x) DoSomething(x)
+    }
+  }
+
+  /** Gets all armors an `Actor` is wearing.
+   *
+   * @param a Actor to check for.
+   * @param nonRepeated Some armors may occupy more than one bodyslot.
+   * When this value is `false`, those armors will be returned multiple times: once for each slot.
+   * @param playableOnly Return only playeable armors?
+   * @param namedOnly Return only named armors?
+   * @returns An array with all equipped armors.
+   */
+  export function GetEquippedArmors(
+    a: Actor | null | undefined,
+    nonRepeated: boolean = true,
+    playableOnly: boolean = true,
+    namedOnly: boolean = true
+  ) {
+    if (!a) return []
+    const all: Armor[] = []
+
+    ForEachEquippedArmor(a, (x) => {
+      const p = playableOnly ? (x.isPlayable() ? x : null) : x
+      const n = p && namedOnly ? (p.getName() !== "" ? p : null) : p
+      if (n) all.push(n)
+    })
+
+    const u = nonRepeated
+      ? all.filter((v, idx, A) => {
+          for (let i = idx + 1; i < A.length; i++) {
+            if (v.getFormID() === A[i].getFormID()) return false
+          }
+          return true
+        })
+      : all
+    return u
+  }
+
   /** Iterates over all items belonging to some `ObjectReference`, from last to first.
    *
    * @param o - The object reference to iterate over.
@@ -441,7 +493,12 @@ export namespace FormLib {
     }
   }
 
-  export function ForEachArmorR(o: ObjectReference, f: (item: Armor) => void) {
+  /** Iterates over all armors belonging to some `ObjectReference`, from last to first.
+   *
+   * @param o - The object reference to iterate over.
+   * @param f - Function applied to each armor.
+   */
+  export function ForEachArmorR(o: ObjectReference, f: (armor: Armor) => void) {
     ForEachItemR(o, (i) => {
       const a = Armor.from(i)
       if (!a) return
@@ -730,7 +787,7 @@ export namespace Hotkeys {
    *
    * With that setup it was impossible to make {@link FromSettings} to read scan codes as strings.
    */
-  enum DxScanCode {
+  export enum DxScanCode {
     None,
     Escape,
     N1,
@@ -859,7 +916,7 @@ export namespace Hotkeys {
    * @param optionName Name of the variable that carries the value.
    * @returns The hotkey. `-1` if invalid.
    */
-  export function FromSettings(pluginName: string, optionName: string) {
+  export function FromSettings(pluginName: string, optionName: string): number {
     const l = settings[pluginName][optionName]
     const t =
       typeof l === "string"
@@ -867,7 +924,7 @@ export namespace Hotkeys {
         : typeof l === "number"
         ? l
         : -1
-    return t === undefined ? -1 : t
+    return t === undefined ? DxScanCode.None : t
   }
 
   /** Listens for some Hotkey press / release / hold.
@@ -918,7 +975,7 @@ export namespace Hotkeys {
     let old = false
     let frames = 0
 
-    return enable
+    return enable && hk > DxScanCode.None
       ? (
           OnPress: KeyPressEvt = DoNothing,
           OnRelease: KeyPressEvt = DoNothing,
