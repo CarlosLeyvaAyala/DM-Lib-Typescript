@@ -425,6 +425,30 @@ export namespace FormLib {
     const f = PreserveForm(a)
     return () => Actor.from(f())
   }
+  /** Does something to an `Actor` after some time has passed.
+   *
+   * @remarks
+   * This was made to hide the tediousness of having to retrieve and check
+   * for an `Actor` each time the `Utility.wait` function is used.
+   *
+   * @param a `Actor` to work on.
+   * @param time Time to wait.
+   * @param DoSomething What to do when the time has passed.
+   */
+  export function WaitActor(
+    a: Actor,
+    time: number,
+    DoSomething: (act: Actor) => void
+  ) {
+    const actor = PreserveActor(a)
+    const f = async () => {
+      await Utility.wait(time)
+      const act = actor()
+      if (!act) return
+      DoSomething(act)
+    }
+    f()
+  }
 
   /** Does something for each `Armor` an `Actor` has equipped.
    *
@@ -533,6 +557,12 @@ export namespace FormLib {
     unknown,
   }
 
+  /** Info a `Form` gets about its esp. */
+  export interface FormEspInfo {
+    name: string
+    type: ModType
+  }
+
   /** Gets the esp a form belongs to.
    *
    * @remarks
@@ -542,7 +572,7 @@ export namespace FormLib {
    * @param form Form to get the esp from.
    * @returns Name and type of the esp file he form belongs to.
    */
-  export function GetFormEsp(form: Form | null | undefined) {
+  export function GetFormEsp(form: Form | null | undefined): FormEspInfo {
     const nil = { name: "", type: ModType.unknown }
     if (!form) return nil
 
@@ -557,6 +587,10 @@ export namespace FormLib {
 
     return nil
   }
+
+  /** Adapter to change a {@link FormEspInfo} to `undefined` if needed. */
+  export const FormEspInfoToUndef = (d: FormEspInfo) =>
+    d.type === ModType.unknown ? { name: undefined, type: undefined } : d
 
   /** Returns the relative `formId` of some `Form`.
    *
