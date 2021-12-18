@@ -411,6 +411,16 @@ export namespace Combinators {
     f(x)
     return x
   }
+
+  /** Returns a value while executing a function.
+   *
+   * @see {@link DebugLib.Log.R} for a sample usage.
+   *
+   * @param f Function to execute.
+   * @param x Value to return.
+   * @returns `x`
+   */
+  export const Return = <T>(f: void, x: T) => Tap(x, K(f))
 }
 
 /** Functions related to `Forms`. */
@@ -948,24 +958,43 @@ export namespace Hotkeys {
    *
    * @param pluginName Name of the plugin to get the value from.
    * @param optionName Name of the variable that carries the value.
-   * @returns The hotkey. `-1` if invalid.
+   * @returns The hotkey. `DxScanCode.None` if invalid.
    */
-  export function FromSettings(pluginName: string, optionName: string): number {
-    const l = settings[pluginName][optionName]
-    const t =
-      typeof l === "string"
-        ? (<any>DxScanCode)[l]
-        : typeof l === "number"
-        ? l
-        : -1
-    return t === undefined ? DxScanCode.None : t
-  }
+  export const FromSettings = (pluginName: string, optionName: string) =>
+    FromValue(settings[pluginName][optionName])
+
+  /** Reads a hotkey from a Json object inside some settings file.
+   * @example
+   * ```json
+   * // Settings file
+   * {
+   *   "hotkeys": {
+   *     "hk1": "Shift Enter"
+   *   }
+   * }
+   * ```
+   * ```ts
+   *
+   * // Typescript
+   * const hk = FromObject("plugin", "hotkeys", "hk1") // => Shift + Enter
+   * ```
+   * @param pluginName Name of the plugin to get the value from.
+   * @param objectName Name of the parent object of the wanted key.
+   * @param optionName Name of the variable that carries the value.
+   * @returns The hotkey. `DxScanCode.None` if invalid.
+   */
+  export const FromObject = (
+    pluginName: string,
+    objectName: string,
+    optionName: string
+    // @ts-ignore
+  ) => FromValue(settings[pluginName][objectName][optionName])
 
   /** Extracts modifiers from a string hotkey. */
   function ExtractHkAndModifiers(s: string) {
     if (!s) return { hk: "None", modifiers: undefined }
     let m: Modifiers | undefined = {}
-    const Find = (sub: string) => {
+    const Find = (sub: Modifier) => {
       if (s.indexOf(sub) > -1) {
         s = s.replace(sub, "").trim()
         return true
@@ -981,6 +1010,32 @@ export namespace Hotkeys {
 
     return { hk: s, modifiers: m }
   }
+
+  export type Modifier = "Alt" | "Ctrl" | "Shift"
+
+  /** Returns wether a Modifier is pressed. */
+  function IsModifierPressed(m: Modifier) {
+    const l =
+      m === "Alt"
+        ? DxScanCode.LeftAlt
+        : m === "Ctrl"
+        ? DxScanCode.LeftControl
+        : DxScanCode.LeftShift
+    const r =
+      m === "Alt"
+        ? DxScanCode.RightAlt
+        : m === "Ctrl"
+        ? DxScanCode.RightControl
+        : DxScanCode.RightShift
+    return () => Input.isKeyPressed(l) || Input.isKeyPressed(r)
+  }
+
+  /** Is `Shift` pressed? */
+  export const IsShiftPressed = IsModifierPressed("Shift")
+  /** Is `Ctrl` pressed? */
+  export const IsCtrlPressed = IsModifierPressed("Ctrl")
+  /** Is `Alt` pressed? */
+  export const IsAltPressed = IsModifierPressed("Alt")
 
   /** Converts either a `string` or `number` to a hotkey value.
    * @remarks
@@ -1028,12 +1083,10 @@ export namespace Hotkeys {
    */
   namespace Modifiers {
     type TF = () => boolean
-    const IsP = (l: DxScanCode, r: DxScanCode) =>
-      Input.isKeyPressed(l) || Input.isKeyPressed(r)
-    const S = () => IsP(DxScanCode.LeftShift, DxScanCode.RightShift)
-    const A = () => IsP(DxScanCode.LeftAlt, DxScanCode.RightAlt)
-    const C = () => IsP(DxScanCode.LeftControl, DxScanCode.RightControl)
-    const T = (k: boolean | undefined, P: () => boolean, f: TF) => {
+    const S = IsShiftPressed
+    const A = IsAltPressed
+    const C = IsCtrlPressed
+    const T = (k: boolean | undefined, P: TF, f: TF) => {
       const p = P()
       if (k) {
         if (!p) return false // Key isn't pressed, but should
@@ -1052,7 +1105,7 @@ export namespace Hotkeys {
     }
   }
 
-  /** */
+  /** Listen to {@link Hotkey}. */
   export const ListenTo = (hk: Hotkey, enable: boolean = true) =>
     ListenToS(hk.hk, enable, hk.modifiers)
 
@@ -1106,7 +1159,7 @@ export namespace Hotkeys {
   export function ListenToS(
     hk: number,
     enable: boolean = true,
-    modifers: Modifiers = {}
+    modifiers?: Modifiers
   ) {
     let old = false
     let frames = 0
@@ -1117,7 +1170,7 @@ export namespace Hotkeys {
           OnRelease: KeyPressEvt = DoNothing,
           OnHold: KeyHoldEvt = DoNothingOnHold
         ) => {
-          if (!Modifiers.Continue(modifers)) return
+          if (modifiers && !Modifiers.Continue(modifiers)) return
           const p = Input.isKeyPressed(hk)
 
           if (old !== p) {
@@ -1442,7 +1495,7 @@ export namespace DebugLib {
      * const x = R(Msg("number"), 2)       // => "This is a number"; x === 2
      * const s = R(Msg("string"), "noob")  // => "This is a string"; s === "noob"
      */
-    export const R = <T>(f: void, x: T) => C.Tap(x, C.K(f))
+    export const R = C.Return
 
     /** Converts an integer to hexadecimal notation.
      *

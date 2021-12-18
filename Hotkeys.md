@@ -1,21 +1,93 @@
 # Hotkeys
 
-These are all hotkey values you can use in a configuration file.
+Here you will find all hotkey values you can use in a configuration file and instructions on how to use them.
 
 You can write values either by name (enclosed between `"`) or number.
 
 ```json
 // By name. Same as 207.
-hotkey: "End"
+"hotkey": "End"
 
 // By number. Same as "End".
-hotkey: 207
+"hotkey": 207
 ```
 
 ***Hotkey names are case sensitive***.\
-This means `"RightControl"` is a valid value, while `"rightControl"`, `"rightcontrol"`, `"rIgHtCoNtrol"`... are not.
+This means `"CapsLock"` is a valid value, while `"capsLock"`, `"capslock"`, `"CaPsLoCk"`... are not.
 
-Here's the list of possible values.
+# Modifiers
+When writing a hotkey by name (the preferred way) it's possible to add modifiers to a hotkey.
+
+These are the three possible modifiers:
+
+| Modifier  |
+|-----------|
+| `"Alt"`   |
+| `"Ctrl"`  |
+| `"Shift"` |
+
+***Modifiers are also case sensitive***.
+
+```json
+// Modifiers ARE ONLY SEPARATED BY AN SPACE. Never use "+".
+"hotkey1": "Shift E",
+"hotkey2": "Alt E",
+"hotkey3": "Ctrl E"
+"hotkey4": "E"
+```
+
+As you just saw, you can assign the same key to many different functions by using a modifier.
+
+When doing so, expect `hotkey4` to be run **only and only** when `E` is pressed alone.
+
+Modifiers are keys that have both left and right key (right shift, left shift, right control...). \
+It doesn't matter which of both you press, since both are the same for this library.
+
+## Modifier combinations
+
+You can also combine many modifiers to define a hotkey.
+
+This effectively raises the possible number of hotkeys to... what??? **At least 400 possible combinations**, so you won't ever get short of hotkeys to use.
+
+Just look at all possibilities **for just one key** (`"F1"`).
+
+```json
+"hotkey1": "F1",
+"hotkey2": "Alt F1",
+"hotkey3": "Ctrl F1",
+"hotkey4": "Shift F1",
+"hotkey5": "Alt Shift F1",
+"hotkey6": "Alt Ctrl F1",
+"hotkey7": "Ctrl Shift F1",
+"hotkey8": "Alt Ctrl Shift F1"
+```
+
+## Nuances
+
+***Modifiers are expected to be used only in combination with other keys***.
+
+This means all of these are invalid:
+
+```json
+"error1": "Shift",
+"error2": "Alt",
+"error3": "Ctrl"
+```
+
+If for some reason you REAAAAALLY want to use one of those keys by themselves, you must define them as a number.
+
+```json
+"hotkey": 56  // Left alt
+"hotkey": 29  // Left ctrl
+"hotkey": 42  // Left shift
+"hotkey": 184 // Right alt
+"hotkey": 157 // Right ctrl
+"hotkey": 54  // Right shift
+```
+
+Still, that's not recommended to do, since some mods like Easy Containers expect you to use a modifier to invert its operations.
+
+# Possible values tables
 
 | As name               | As number |
 |-----------------------|-----------|
@@ -58,12 +130,9 @@ Here's the list of possible values.
 | `"J"`                 | 36        |
 | `"K"`                 | 37        |
 | `"L"`                 | 38        |
-| `"LeftAlt"`           | 56        |
 | `"LeftArrow"`         | 203       |
 | `"LeftBracket"`       | 26        |
-| `"LeftControl"`       | 29        |
 | `"LeftMouseButton"`   | 256       |
-| `"LeftShift"`         | 42        |
 | `"M"`                 | 50        |
 | `"MiddleMouseButton"` | 258       |
 | `"Minus"`             | 12        |
@@ -111,12 +180,9 @@ Here's the list of possible values.
 | `"PgUp"`              | 201       |
 | `"Q"`                 | 16        |
 | `"R"`                 | 19        |
-| `"RightAlt"`          | 184       |
 | `"RightArrow"`        | 205       |
 | `"RightBracket"`      | 27        |
-| `"RightControl"`      | 157       |
 | `"RightMouseButton"`  | 257       |
-| `"RightShift"`        | 54        |
 | `"S"`                 | 31        |
 | `"ScrollLock"`        | 70        |
 | `"Semicolon"`         | 39        |
@@ -165,7 +231,6 @@ Same list, sorted by number:
 | `"LeftBracket"`       | 26        |
 | `"RightBracket"`      | 27        |
 | `"Enter"`             | 28        |
-| `"LeftControl"`       | 29        |
 | `"A"`                 | 30        |
 | `"S"`                 | 31        |
 | `"D"`                 | 32        |
@@ -178,7 +243,6 @@ Same list, sorted by number:
 | `"Semicolon"`         | 39        |
 | `"Apostrophe"`        | 40        |
 | `"Console"`           | 41        |
-| `"LeftShift"`         | 42        |
 | `"BackSlash"`         | 43        |
 | `"Z"`                 | 44        |
 | `"X"`                 | 45        |
@@ -190,9 +254,7 @@ Same list, sorted by number:
 | `"Comma"`             | 51        |
 | `"Period"`            | 52        |
 | `"ForwardSlash"`      | 53        |
-| `"RightShift"`        | 54        |
 | `"NumMult"`           | 55        |
-| `"LeftAlt"`           | 56        |
 | `"Spacebar"`          | 57        |
 | `"CapsLock"`          | 58        |
 | `"F1"`                | 59        |
@@ -223,10 +285,8 @@ Same list, sorted by number:
 | `"F11"`               | 87        |
 | `"F12"`               | 88        |
 | `"NumEnter"`          | 156       |
-| `"RightControl"`      | 157       |
 | `"NumSlash"`          | 181       |
 | `"SysRqPtrScr"`       | 183       |
-| `"RightAlt"`          | 184       |
 | `"Pause"`             | 197       |
 | `"Home"`              | 199       |
 | `"UpArrow"`           | 200       |
