@@ -15,6 +15,8 @@ You can write values either by name (enclosed between `"`) or number.
 ***Hotkey names are case sensitive***.\
 This means `"CapsLock"` is a valid value, while `"capsLock"`, `"capslock"`, `"CaPsLoCk"`... are not.
 
+A table with all possible values, both as text or number, lies at the end of this page.
+
 # Modifiers
 When writing a hotkey by name (the preferred way) it's possible to add modifiers to a hotkey.
 
@@ -41,13 +43,13 @@ As you just saw, you can assign the same key to many different functions by usin
 When doing so, expect `hotkey4` to be run **only and only** when `E` is pressed alone.
 
 Modifiers are keys that have both left and right key (right shift, left shift, right control...). \
-It doesn't matter which of both you press, since both are the same for this library.
+It doesn't matter which of both you press, since both are the same for whatever mod sent you here.
 
 ## Modifier combinations
 
 You can also combine many modifiers to define a hotkey.
 
-This effectively raises the possible number of hotkeys to... what??? **At least 400 possible combinations**, so you won't ever get short of hotkeys to use.
+This effectively raises the possible number of hotkeys to... what??? **Around 800 possible combinations**, so you won't ever get short on hotkeys to use.
 
 Just look at all possibilities **for just one key** (`"F1"`).
 
@@ -62,6 +64,16 @@ Just look at all possibilities **for just one key** (`"F1"`).
 "hotkey8": "Alt Ctrl Shift F1"
 ```
 
+Order doesn't matter, by the way.\
+All of these are the same:
+```json
+"hotkey5": "Alt Shift F1"
+"hotkey5": "F1 Alt Shift"
+"hotkey5": "Alt F1 Shift"
+"hotkey5": "Shift Alt F1"
+// etc...
+```
+
 ## Nuances
 
 ***Modifiers are expected to be used only in combination with other keys***.
@@ -74,20 +86,29 @@ This means all of these are invalid:
 "error3": "Ctrl"
 ```
 
-If for some reason you REAAAAALLY want to use one of those keys by themselves, you must define them as a number.
+If for some reason you REAAAAALLY want to use one of those keys by themselves (what for? You have another 800 options), you must define your hotkey as a number.
 
 ```json
-"hotkey": 56  // Left alt
-"hotkey": 29  // Left ctrl
-"hotkey": 42  // Left shift
-"hotkey": 184 // Right alt
-"hotkey": 157 // Right ctrl
-"hotkey": 54  // Right shift
+// When defining a hotkey like this, SIDE DOES ACTUALLY MATTER
+
+// Alt
+"hotkey": 56  // Left
+"hotkey": 184 // Right
+
+// Ctrl
+"hotkey": 29  // Left
+"hotkey": 157 // Right
+
+// Shift
+"hotkey": 42  // Left
+"hotkey": 54  // Right
 ```
 
 Still, that's not recommended to do, since some mods like Easy Containers expect you to use a modifier to invert its operations.
 
 # Possible values tables
+
+Alphabetically sorted:
 
 | As name               | As number |
 |-----------------------|-----------|
