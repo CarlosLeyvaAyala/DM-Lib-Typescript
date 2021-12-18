@@ -1,6 +1,8 @@
+Here you will find all hotkey values you can use in a configuration file and instructions on how to use them.
+
 # Hotkeys
 
-Here you will find all hotkey values you can use in a configuration file and instructions on how to use them.
+A table with all possible values, both as text or number, lies [at the end of this page](#possible-values-tables).
 
 You can write values either by name (enclosed between `"`) or number.
 
@@ -15,7 +17,26 @@ You can write values either by name (enclosed between `"`) or number.
 ***Hotkey names are case sensitive***.\
 This means `"CapsLock"` is a valid value, while `"capsLock"`, `"capslock"`, `"CaPsLoCk"`... are not.
 
-A table with all possible values, both as text or number, lies at the end of this page.
+## Removing hotkeys
+
+If you are never going to use some key, it's better for performance reasons to just disable it.
+
+You can use either of these values.
+
+```json
+"hotkey": 0
+"hotkey": ""
+"hotkey": "None"
+// Invalid casing is considered to be "None"
+"hotkey": "CaPsLoCk"
+// Values not in table are considered to be "None"
+"hotkey": "meh"
+```
+
+Read carefully instructions on per mod basis.\
+Some mods like the [Skimpify Framework][] or [Max Sick Gains][] will automatically switch off these hotkeys based on whatever functionality you have activated, so you don't need to explicitly remove hotkeys for them.
+
+Others, like [Easy Containers][], will require to switch off hotkeys you won't use.
 
 # Modifiers
 When writing a hotkey by name (the preferred way) it's possible to add modifiers to a hotkey.
@@ -49,7 +70,7 @@ It doesn't matter which of both you press, since both are the same for whatever 
 
 You can also combine many modifiers to define a hotkey.
 
-This effectively raises the possible number of hotkeys to... what??? **Around 800 possible combinations**, so you won't ever get short on hotkeys to use.
+This effectively raises the possible number of hotkeys to... what? **Around 800 possible combinations**, so you won't ever get short on hotkeys to use.
 
 Just look at all possibilities **for just one key** (`"F1"`).
 
@@ -86,7 +107,7 @@ This means all of these are invalid:
 "error3": "Ctrl"
 ```
 
-If for some reason you REAAAAALLY want to use one of those keys by themselves (what for? You have another 800 options), you must define your hotkey as a number.
+If for some reason you REAAAAALLY want to use one of those keys by itself (what for? You have another 800 options), you must define your hotkey as a number.
 
 ```json
 // When defining a hotkey like this, SIDE DOES ACTUALLY MATTER
@@ -104,7 +125,7 @@ If for some reason you REAAAAALLY want to use one of those keys by themselves (w
 "hotkey": 54  // Right
 ```
 
-Still, that's not recommended to do, since some mods like Easy Containers expect you to use a modifier to invert its operations.
+Still, that's not recommended to do, since some mods like [Easy Containers][] expect you to use a modifier to invert its operations.
 
 # Possible values tables
 
@@ -329,3 +350,7 @@ Same list, sorted by number:
 | `"MouseButton7"`      | 263       |
 | `"MouseWheelUp"`      | 264       |
 | `"MouseWheelDown"`    | 265       |
+
+[Easy Containers]: https://github.com/CarlosLeyvaAyala/Easy-Containers
+[Max Sick Gains]: https://github.com/CarlosLeyvaAyala/Max-Sick-Gains
+[Skimpify Framework]: https://github.com/CarlosLeyvaAyala/skimpify-framework
