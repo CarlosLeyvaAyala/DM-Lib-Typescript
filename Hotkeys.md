@@ -1,5 +1,13 @@
 Here you will find all hotkey values you can use in a configuration file and instructions on how to use them.
 
+- [Hotkeys](#hotkeys)
+  - [Removing hotkeys](#removing-hotkeys)
+    - [What if I don't disable hotkeys?](#what-if-i-dont-disable-hotkeys)
+- [Modifiers](#modifiers)
+  - [Modifier combinations](#modifier-combinations)
+  - [Nuances](#nuances)
+- [Possible values tables](#possible-values-tables)
+
 # Hotkeys
 
 A table with all possible values, both as text or number, lies [at the end of this page](#possible-values-tables).
@@ -37,6 +45,14 @@ Read carefully instructions on per mod basis.\
 Some mods like the [Skimpify Framework][] or [Max Sick Gains][] will automatically switch off these hotkeys based on whatever functionality you have activated, so you don't need to explicitly remove hotkeys for them.
 
 Others, like [Easy Containers][], will require to switch off hotkeys you won't use.
+
+### What if I don't disable hotkeys?
+
+If you were living in the 80's or this mod was made in Papyrus, maybe you could expect some frame drops.
+
+But since that is neither the case, the only thing that would happen is that your processor will waste nanoseconds doing useless checks that will never come true.
+
+Those inconceivable short fractions of seconds would be better spent doing other things.
 
 # Modifiers
 When writing a hotkey by name (the preferred way) it's possible to add modifiers to a hotkey.
@@ -125,7 +141,7 @@ If for some reason you REAAAAALLY want to use one of those keys by itself (what 
 "hotkey": 54  // Right
 ```
 
-Still, that's not recommended to do, since some mods like [Easy Containers][] expect you to use a modifier to invert its operations.
+Still, it's not recommended to do so, since some mods like [Easy Containers][] expect you to use a modifier to invert its operations.
 
 # Possible values tables
 
