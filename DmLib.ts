@@ -8,6 +8,7 @@ import {
   Input,
   ObjectReference,
   once,
+  Outfit,
   printConsole,
   settings,
   SlotMask,
@@ -524,6 +525,24 @@ export namespace FormLib {
     while (i > 0) {
       i--
       f(o.getNthForm(i))
+    }
+  }
+
+  /** Iterates over all items belonging to some `Outfit`, from last to first.
+   *
+   * @param o - The outfit to iterate over.
+   * @param f - Function applied to each item.
+   */
+  export function ForEachOutfitItemR(
+    o: Outfit | null,
+    f: (item: Form) => void
+  ) {
+    if (!o) return
+    let i = o.getNumParts()
+    while (i > 0) {
+      i--
+      const ii = o.getNthPart(i)
+      if (ii) f(ii)
     }
   }
 
@@ -1236,15 +1255,18 @@ export namespace DebugLib {
       pluginName: string,
       optionName: string
     ): Level {
-      const l = settings[pluginName][optionName]
-      const l2 =
-        typeof l === "string"
-          ? l.toLowerCase()
-          : typeof l === "number"
-          ? l
+      return LevelFromValue(settings[pluginName][optionName])
+    }
+
+    export function LevelFromValue(v: any) {
+      const l =
+        typeof v === "string"
+          ? v.toLowerCase()
+          : typeof v === "number"
+          ? v
           : "verbose"
-      let t = (<any>Level)[l2]
-      if (typeof l2 === "number") t = Level[t]
+      let t = (<any>Level)[l]
+      if (typeof l === "number") t = Level[t]
       return t === undefined ? Level.verbose : t
     }
 
