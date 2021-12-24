@@ -970,6 +970,28 @@ export namespace Hotkeys {
   export const DoNothing: KeyPressEvt = () => {}
   export const DoNothingOnHold: KeyHoldEvt = (_) => () => {}
 
+  /** Creates a function that reads and logs a Hotkey at the same time.
+   *
+   * @param Log {@link DebugLib.Log.TappedFunction} used to log the hotkey.
+   * @param Get A function that gets a hotkey by name.
+   * @param appendStr Message to append before the hotkey name and data. `"Hotkey "` by default.
+   * @returns A function that accepts a key name and returns a {@link Hotkey}.
+   *
+   * @example
+   * const LH = DebugLib.Log.Tap(printConsole)
+   * const GetHotkey = GetAndLog(LH, FromValue)
+   *
+   * ListenTo(GetHotkey("hk1")) // => "Hotkey hk1: Shift Enter" is printed to console
+   */
+  export function GetAndLog(
+    Log: DebugLib.Log.TappedFunction,
+    Get: (k: string) => Hotkey,
+    appendStr: string = "Hotkey "
+  ) {
+    const A = appendStr ? DebugLib.Log.AppendT(Log, appendStr) : Log
+    return (k: string) => A(k, Get(k), ToString)
+  }
+
   /** Gets a hotkey from some configuration file.
    *
    * @remarks
@@ -1357,9 +1379,7 @@ export namespace DebugLib {
      * CMLL("Is life")     // => "Kemonito: Is life"
      */
     export function Append(f: LoggingFunction, append: any): LoggingFunction {
-      return (msg: any) => {
-        f(append + msg)
-      }
+      return (msg: any) => f(append + msg)
     }
 
     /** Creates a logging function that appends some message before logging.
