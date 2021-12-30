@@ -13,7 +13,9 @@ import {
   settings,
   SlotMask,
   storage,
+  TESModPlatform,
   Utility,
+  WorldSpace,
   writeLogs,
 } from "skyrimPlatform"
 
@@ -664,6 +666,28 @@ export namespace FormLib {
     if (!form) return "Undefined form"
     const d = GetFormEspAndId(form)
     return format(d.modName, d.fixedFormId, d.type)
+  }
+
+  /** Creates a persistent chest hidden somewhere in Tamriel.
+   *
+   * @remarks
+   * This chest can be used as a permanent storage that never resets.
+   *
+   * Because of the way things are created in Skyrim, we need to get an object reference first.
+   *
+   * @returns The FormId of the recently created chest. `null` if no chest could be created.
+   */
+  export function CreatePersistentChest() {
+    // Spawn chest at player's location
+    const p = Game.getPlayer() as Actor
+    const c = p.placeAtMe(Game.getFormEx(0x70479), 1, true, false)
+    if (!c) return null
+
+    // Move the chest to Tamriel
+    const world = WorldSpace.from(Game.getFormEx(0x3c))
+    TESModPlatform.moveRefrToPosition(c, null, world, 0, 0, -10000, 0, 0, 0)
+
+    return c.getFormID()
   }
 }
 
