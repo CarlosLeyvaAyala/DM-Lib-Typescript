@@ -183,7 +183,7 @@ export namespace MathLib {
             a * cur.y +
             b * next.y +
             ((h * h) / 6) *
-              ((a * a * a - a) * sd[i] + (b * b * b - b) * sd[i + 1])
+            ((a * a * a - a) * sd[i] + (b * b * b - b) * sd[i + 1])
           )
         }
       }
@@ -390,8 +390,8 @@ export namespace Combinators {
    */
   export const K =
     <T>(x: T) =>
-    (y: any): T =>
-      x
+      (y: any): T =>
+        x
 
   /** Creates a function that accepts one parameter `x`. Returns `f1(x)` if not `null`, else `f2(x)`.
    *
@@ -401,8 +401,8 @@ export namespace Combinators {
    */
   export const O =
     <U>(f1: (...args: any[]) => U | null, f2: (...args: any[]) => U) =>
-    (...args: any[]): U =>
-      f1(...args) || f2(...args)
+      (...args: any[]): U =>
+        f1(...args) || f2(...args)
 
   /** Applies function `f` to `x` and returns `x`. Useful for chaining functions that return nothing.
    *
@@ -505,11 +505,11 @@ export namespace FormLib {
 
     const u = nonRepeated
       ? all.filter((v, idx, A) => {
-          for (let i = idx + 1; i < A.length; i++) {
-            if (v.getFormID() === A[i].getFormID()) return false
-          }
-          return true
-        })
+        for (let i = idx + 1; i < A.length; i++) {
+          if (v.getFormID() === A[i].getFormID()) return false
+        }
+        return true
+      })
       : all
     return u
   }
@@ -991,8 +991,8 @@ export namespace Hotkeys {
 
   export type KeyPressEvt = () => void
   export type KeyHoldEvt = (frames: number) => () => void
-  export const DoNothing: KeyPressEvt = () => {}
-  export const DoNothingOnHold: KeyHoldEvt = (_) => () => {}
+  export const DoNothing: KeyPressEvt = () => { }
+  export const DoNothingOnHold: KeyHoldEvt = (_) => () => { }
 
   /** Creates a function that reads and logs a Hotkey at the same time.
    *
@@ -1084,14 +1084,14 @@ export namespace Hotkeys {
       m === "Alt"
         ? DxScanCode.LeftAlt
         : m === "Ctrl"
-        ? DxScanCode.LeftControl
-        : DxScanCode.LeftShift
+          ? DxScanCode.LeftControl
+          : DxScanCode.LeftShift
     const r =
       m === "Alt"
         ? DxScanCode.RightAlt
         : m === "Ctrl"
-        ? DxScanCode.RightControl
-        : DxScanCode.RightShift
+          ? DxScanCode.RightControl
+          : DxScanCode.RightShift
     return () => Input.isKeyPressed(l) || Input.isKeyPressed(r)
   }
 
@@ -1231,29 +1231,29 @@ export namespace Hotkeys {
 
     return enable && hk > DxScanCode.None
       ? (
-          OnPress: KeyPressEvt = DoNothing,
-          OnRelease: KeyPressEvt = DoNothing,
-          OnHold: KeyHoldEvt = DoNothingOnHold
-        ) => {
-          if (modifiers && !Modifiers.Continue(modifiers)) return
-          const p = Input.isKeyPressed(hk)
+        OnPress: KeyPressEvt = DoNothing,
+        OnRelease: KeyPressEvt = DoNothing,
+        OnHold: KeyHoldEvt = DoNothingOnHold
+      ) => {
+        if (modifiers && !Modifiers.Continue(modifiers)) return
+        const p = Input.isKeyPressed(hk)
 
-          if (old !== p) {
-            frames = 0
-            if (p) once("update", OnPress)
-            else once("update", OnRelease)
-          } else if (p) {
-            frames++
-            once("update", OnHold(frames))
-          }
-
-          old = p
+        if (old !== p) {
+          frames = 0
+          if (p) once("update", OnPress)
+          else once("update", OnRelease)
+        } else if (p) {
+          frames++
+          once("update", OnHold(frames))
         }
+
+        old = p
+      }
       : (
-          OnPress: KeyPressEvt = DoNothing,
-          OnRelease: KeyPressEvt = DoNothing,
-          OnHold: KeyHoldEvt = DoNothingOnHold
-        ) => {}
+        OnPress: KeyPressEvt = DoNothing,
+        OnRelease: KeyPressEvt = DoNothing,
+        OnHold: KeyHoldEvt = DoNothingOnHold
+      ) => { }
   }
 
   /** Not an useful function. Use it as a template. @see {@link ListenTo} */
@@ -1277,7 +1277,6 @@ export namespace DebugLib {
   export namespace Log {
     /** How much will the console be spammed.
      * - optimization     Meant to only output the times functions take to execute. Used for bottleneck solving.
-     *
      * - none       No spam.
      * - error      Just errors and stuff like that.
      * - info       Detailed info so players can know if things are going as expected, but not enough for actual debugging.
@@ -1309,8 +1308,8 @@ export namespace DebugLib {
         typeof v === "string"
           ? v.toLowerCase()
           : typeof v === "number"
-          ? v
-          : "verbose"
+            ? v
+            : "verbose"
       let t = (<any>Level)[l]
       if (typeof l === "number") t = Level[t]
       return t === undefined ? Level.verbose : t
