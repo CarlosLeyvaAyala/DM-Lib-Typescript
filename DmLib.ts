@@ -150,8 +150,8 @@ export namespace MathLib {
     const n = points.length - 1
 
     // Avoid invalid number of points.
-    if (n == 0) return (x: number) => 0
-    if (n == 1) return (x: number) => points[0].y
+    if (n == -1) return (x: number) => 0
+    if (n == 0) return (x: number) => points[0].y
     const sd = SecondDerivative(points)
 
     return (x: number) => {
