@@ -1631,10 +1631,14 @@ export namespace DebugLib {
 /** Animation helpers */
 export namespace AnimLib {
   export const enum Animations {
+    AttackPowerStartBackLeftHand = "attackPowerStartBackLeftHand",
     AttackPowerStartBackward = "attackPowerStartBackward",
     AttackPowerStartDualWield = "attackPowerStartDualWield",
     AttackPowerStartForward = "attackPowerStartForward",
+    AttackPowerStartForwardH2HLeftHand = "attackPowerStartForwardH2HLeftHand",
+    AttackPowerStartForwardH2HRightHand = "attackPowerStartForwardH2HRightHand",
     AttackPowerStartForwardLeftHand = "attackPowerStartForwardLeftHand",
+    AttackPowerStartH2HCombo = "attackPowerStartH2HCombo",
     AttackPowerStartInPlace = "attackPowerStartInPlace",
     AttackPowerStartInPlaceLeftHand = "attackPowerStartInPlaceLeftHand",
     AttackPowerStartLeft = "attackPowerStartLeft",
@@ -1643,6 +1647,8 @@ export namespace AnimLib {
     AttackPowerStartRightLeftHand = "attackPowerStartRightLeftHand",
     AttackStart = "attackStart",
     AttackStartDualWield = "attackStartDualWield",
+    AttackStartH2HLeft = "AttackStartH2HLeft",
+    AttackStartH2HRight = "AttackStartH2HRight",
     AttackStartLeftHand = "attackStartLeftHand",
     BashStart = "bashStart",
     BlockStart = "blockStart",
