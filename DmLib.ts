@@ -5,6 +5,7 @@ import {
   Form,
   FormType,
   Game,
+  hooks,
   Input,
   ObjectReference,
   once,
@@ -33,6 +34,9 @@ export namespace TimeLib {
   /** Hours as humans use them; where 24 == 1.0 days. */
   export type HumanHours = number
 
+  /** Minutes as humans use them; where `1 == 0.00069444` Skyrim days. */
+  export type HumanMinutes = number
+
   /** Changes {@link SkyrimHours} to {@link HumanHours}.
    *
    * @param x Time in {@link SkyrimHours}.
@@ -44,10 +48,16 @@ export namespace TimeLib {
    */
   export const ToHumanHours = (x: SkyrimHours): HumanHours => x / gameHourRatio
 
-  /** Converts a {@link SkyrimHours} to a `string` in {@link HumanHours} */
+  /** Converts a {@link SkyrimHours} to a `string` in {@link HumanHours}. */
   export const ToHumanHoursStr = (x: SkyrimHours) => ToHumanHours(x).toString()
 
-  /** Changes {@link HumanHours} to {@link SkyrimHours}.
+  /** Converts a time in minutes to hours. */
+  export const MinutesToHours = (x: number) => x / 60
+
+  /** Converts a time in hours to minutes. */
+  export const HoursToMinutes = (x: number) => x * 60
+
+  /** Converts {@link HumanHours} to {@link SkyrimHours}.
    *
    * @param x Time in human readable hours.
    * @returns Time in {@link SkyrimHours}.
@@ -65,6 +75,18 @@ export namespace TimeLib {
    */
   export const HourSpan = (then: SkyrimHours): HumanHours =>
     ToHumanHours(Now() - then)
+
+  /** Converts {@link HumanMinutes} to {@link SkyrimHours}.
+   * @param  {number} x Minutes to convert.
+   */
+  export const MinutesToSkyrimHours = (x: HumanMinutes) =>
+    ToSkyrimHours(MinutesToHours(x))
+
+  /** Converts {@link SkyrimHours} to {@link HumanMinutes}.
+   * @param  {number} x Minutes to convert.
+   */
+  export const SkyrimHoursToHumanMinutes = (x: SkyrimHours) =>
+    HoursToMinutes(ToHumanHours(x))
 }
 
 /** Math related functions. */
@@ -1603,5 +1625,88 @@ export namespace DebugLib {
         Log(`Execution time for ${f.name}: ${t2 - t1}`)
       })
     }
+  }
+}
+
+/** Animation helpers */
+export namespace AnimLib {
+  export const enum Animations {
+    AttackPowerStartBackward = "attackPowerStartBackward",
+    AttackPowerStartDualWield = "attackPowerStartDualWield",
+    AttackPowerStartForward = "attackPowerStartForward",
+    AttackPowerStartForwardLeftHand = "attackPowerStartForwardLeftHand",
+    AttackPowerStartInPlace = "attackPowerStartInPlace",
+    AttackPowerStartInPlaceLeftHand = "attackPowerStartInPlaceLeftHand",
+    AttackPowerStartLeft = "attackPowerStartLeft",
+    AttackPowerStartLeftLeftHand = "attackPowerStartLeftLeftHand",
+    AttackPowerStartRight = "attackPowerStartRight",
+    AttackPowerStartRightLeftHand = "attackPowerStartRightLeftHand",
+    AttackStart = "attackStart",
+    AttackStartDualWield = "attackStartDualWield",
+    AttackStartLeftHand = "attackStartLeftHand",
+    BashStart = "bashStart",
+    BlockStart = "blockStart",
+    BlockStop = "blockStop",
+    BowAttackStart = "bowAttackStart",
+    ChairDrinkingStart = "ChairDrinkingStart",
+    HorseEnter = "HorseEnter",
+    HorseExit = "HorseExit",
+    IdleAlchemyEnter = "IdleAlchemyEnter",
+    IdleBedExitStart = "IdleBedExitStart",
+    IdleBedLeftEnterStart = "IdleBedLeftEnterStart",
+    IdleBlacksmithForgeEnter = "IdleBlacksmithForgeEnter",
+    IdleCarryBucketPourEnter = "IdleCarryBucketPourEnter",
+    IdleChairFrontEnter = "IdleChairFrontEnter",
+    IdleChairShoulderFlex = "idleChairShoulderFlex",
+    IdleCounterStart = "IdleCounterStart",
+    IdleEnchantingEnter = "IdleEnchantingEnter",
+    IdleExamine = "IdleExamine",
+    IdleFeedChicken = "IdleFeedChicken",
+    IdleLeanTableEnter = "IdleLeanTableEnter",
+    IdleLooseSweepingStart = "idleLooseSweepingStart",
+    IdleSharpeningWheelStart = "IdleSharpeningWheelStart",
+    IdleStop = "IdleStop",
+    IdleStopInstant = "IdleStopInstant",
+    IdleTanningEnter = "IdleTanningEnter",
+    IdleTelvanniTowerFloatDown = "IdleTelvanniTowerFloatDown",
+    IdleTelvanniTowerFloatUp = "IdleTelvanniTowerFloatUp",
+    IdleWallLeanStart = "IdleWallLeanStart",
+    JumpDirectionalStart = "JumpDirectionalStart",
+    JumpLand = "JumpLand",
+    JumpLandDirectional = "JumpLandDirectional",
+    JumpStandingStart = "JumpStandingStart",
+    SneakSprintStartRoll = "SneakSprintStartRoll",
+    SneakStart = "SneakStart",
+    SneakStop = "SneakStop",
+    SprintStart = "SprintStart",
+    SprintStop = "SprintStop",
+    SwimStart = "SwimStart",
+    SwimStop = "SwimStop",
+    Unequip = "Unequip",
+  }
+
+  /** Adds a hook to react to some animation event.
+   * @param  {string} animName Name of the animation to react to.
+   * @param  {()=>void} callback Function to call when animation is played.
+   * @param  {number | undefined} minFormId Minimum FormId of actors to react to.
+   * @param  {number | undefined} maxFormId Maximum FormId of actors to react to.
+   */
+  export function HookAnim(
+    animName: string,
+    callback: () => void,
+    minFormId: number | undefined,
+    maxFormId: number | undefined
+  ) {
+    hooks.sendAnimationEvent.add(
+      {
+        enter(_) {},
+        leave(c) {
+          if (c.animationSucceeded) once("update", () => callback())
+        },
+      },
+      minFormId,
+      maxFormId,
+      animName
+    )
   }
 }
