@@ -444,6 +444,8 @@ export namespace Combinators {
 
 /** Functions related to `Forms`. */
 export namespace FormLib {
+  export const playerId = 0x14
+
   export function PreserveForm(frm: Form | null) {
     if (!frm) return () => null
     const id = frm.getFormID()
@@ -1186,6 +1188,12 @@ export namespace Hotkeys {
     }
   }
 
+  export type ListeningFunction = (
+    OnPress?: KeyPressEvt,
+    OnRelease?: KeyPressEvt,
+    OnHold?: KeyHoldEvt
+  ) => void
+
   /** Listen to {@link Hotkey}. */
   export const ListenTo = (hk: Hotkey, enable: boolean = true) =>
     ListenToS(hk.hk, enable, hk.modifiers)
@@ -1241,7 +1249,7 @@ export namespace Hotkeys {
     hk: number,
     enable: boolean = true,
     modifiers?: Modifiers
-  ) {
+  ): ListeningFunction {
     let old = false
     let frames = 0
 
