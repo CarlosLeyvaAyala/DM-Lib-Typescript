@@ -456,6 +456,7 @@ export namespace FormLib {
     const f = PreserveForm(a)
     return () => Actor.from(f())
   }
+
   /** Does something to an `Actor` after some time has passed.
    *
    * @remarks
@@ -707,6 +708,20 @@ export namespace FormLib {
 
     return c.getFormID()
   }
+
+  /** Returns wether an `ObjectReference` is an alchemy lab.
+   * @param  {ObjectReference} furniture The furniture to check.
+   *
+   * @remarks
+   * This function is intended to be used with `on("furnitureEnter")`
+   * and `on("furnitureExit")` Skyrim Platform events.
+   */
+  export const IsAlchemyLab = (furniture: ObjectReference) =>
+    ObjRefHasName(furniture, "alchemy")
+
+  /** Tests if an object reference contains some name */
+  const ObjRefHasName = (f: ObjectReference, name: string) =>
+    f.getBaseObject()?.getName().toLowerCase().includes(name)
 }
 
 /** Functions related to arrays. */
