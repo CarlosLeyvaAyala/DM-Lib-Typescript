@@ -726,6 +726,49 @@ export namespace FormLib {
 
     return c.getFormID()
   }
+  /** Tries to get a persistent chest defined in some place and creates a new
+   * one if it doesn't exist.
+   *
+   * @param  {()=>Form|null|undefined} Getter Function that gets an already existing chest.
+   * @param  {(frm:Form|null|undefined)=>void} Setter Function that saves a newly created chest.
+   * @param  {(msg:string)=>void} Logger? Function to log an error if a new chest couldn't be created.
+   *
+   * @example
+   *   // This uses a JContainers database to know what chest is being created
+   *   const path = "some.JContainers.path"
+   *   const h = GetSomeJContainersHandle(path)
+   *   const someForm = Game.getFormEx(0x14)
+   *
+   *   const Getter = () => {
+   *     return JFormMap.getForm(h, someForm)
+   *   }
+   *   const Setter = (frm: Form | null | undefined) => {
+   *     JFormMap.setForm(h, someForm, frm)
+   *     SaveSomeJContainersHandle(h, path)
+   *   }
+   *
+   *   const chest = FormLib.GetPersistentChest(Getter, Setter, printConsole)
+   */
+  export function GetPersistentChest(
+    Getter: () => Form | null | undefined,
+    Setter: (frm: Form | null | undefined) => void,
+    Logger?: (msg: string) => void
+  ) {
+    let frm = Getter()
+    if (!frm) {
+      const newChest = FormLib.CreatePersistentChest()
+      if (!newChest) {
+        const msg =
+          "Could not create a persistent chest in Tamriel. " +
+          "Are you using a mod that substantially changes the game?"
+        if (Logger) Logger(msg)
+        return null
+      }
+      frm = Game.getFormEx(newChest)
+      Setter(frm)
+    }
+    return frm
+  }
 
   /** Returns wether an `ObjectReference` is an alchemy lab.
    * @param  {ObjectReference} furniture The furniture to check.
