@@ -503,7 +503,7 @@ export namespace FormLib {
    * @param DoSomething What to do when an equipped armor is found.
    */
   export function ForEachEquippedArmor(
-    a: Actor | null | undefined,
+    a: Actor | null,
     DoSomething: (arm: Armor) => void
   ) {
     if (!a) return
@@ -521,9 +521,15 @@ export namespace FormLib {
    * @param playableOnly Return only playeable armors?
    * @param namedOnly Return only named armors?
    * @returns An array with all equipped armors.
+   *
+   * @remarks
+   * ***WARNING***. This function ***may*** be slow (not to Papyrus levels, of course) and
+   * it's recommended to be used with caution in real production code.
+   *
+   * However, it can be safely used sparingly.
    */
   export function GetEquippedArmors(
-    a: Actor | null | undefined,
+    a: Actor | null,
     nonRepeated: boolean = true,
     playableOnly: boolean = true,
     namedOnly: boolean = true
@@ -537,15 +543,12 @@ export namespace FormLib {
       if (n) all.push(n)
     })
 
-    const u = nonRepeated
-      ? all.filter((v, idx, A) => {
-          for (let i = idx + 1; i < A.length; i++) {
-            if (v.getFormID() === A[i].getFormID()) return false
-          }
-          return true
-        })
-      : all
-    return u
+    const GetNonRepeated = () => {
+      const uIds = [...new Set(all.map((a) => a.getFormID()))]
+      return uIds.map((id) => Armor.from(Game.getFormEx(id)) as Armor)
+    }
+
+    return nonRepeated ? GetNonRepeated() : all
   }
 
   /** Iterates over all items belonging to some `ObjectReference`, from last to first.
@@ -764,8 +767,8 @@ export namespace FormLib {
    *   const chest = FormLib.GetPersistentChest(Getter, Setter, printConsole)
    */
   export function GetPersistentChest(
-    Getter: () => Form | null | undefined,
-    Setter: (frm: Form | null | undefined) => void,
+    Getter: () => Form | null,
+    Setter: (frm: Form | null) => void,
     Logger?: (msg: string) => void
   ) {
     let frm = Getter()
