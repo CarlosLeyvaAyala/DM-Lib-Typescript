@@ -1,22 +1,30 @@
 import {
   Actor,
+  Ammo,
   Armor,
+  Book,
   Cell,
   Form,
   FormType,
   Game,
   hooks,
+  Ingredient,
   Input,
+  Key,
   Keyword,
+  MiscObject,
   ObjectReference,
   once,
   Outfit,
+  Potion,
   printConsole,
   settings,
   SlotMask,
+  SoulGem,
   storage,
   TESModPlatform,
   Utility,
+  Weapon,
   WorldSpace,
   writeLogs,
 } from "skyrimPlatform"
@@ -461,6 +469,47 @@ export namespace FormLib {
    */
   export const Player = () => Game.getPlayer() as Actor
 
+  export const enum ItemType {
+    None,
+    Weapon,
+    Ammo,
+    Armor,
+    Potion,
+    Poison,
+    Scroll,
+    Food,
+    Ingredient,
+    Book,
+    Key,
+    Misc,
+    SoulGem,
+  }
+
+  /** Returns what type of item a `Form` is.
+   * @param  {Form|null} item Form to check.
+   */
+  export function GetItemType(item: Form | null) {
+    if (!item) return ItemType.None
+    if (Weapon.from(item)) return ItemType.Weapon
+    if (Ammo.from(item)) return ItemType.Ammo
+    if (Armor.from(item)) return ItemType.Armor
+
+    const asP = Potion.from(item)
+    if (asP) {
+      if (asP.isPoison()) return ItemType.Poison
+      if (asP.isFood()) return ItemType.Food
+      return ItemType.Potion
+    }
+
+    if (Ingredient.from(item)) return ItemType.Ingredient
+    if (Book.from(item)) return ItemType.Book
+    if (Key.from(item)) return ItemType.Key
+    if (SoulGem.from(item)) return ItemType.SoulGem
+    if (MiscObject.from(item)) return ItemType.Misc
+
+    return ItemType.None
+  }
+
   export function PreserveForm(frm: Form | null) {
     if (!frm) return () => null
     const id = frm.getFormID()
@@ -478,8 +527,12 @@ export namespace FormLib {
    * This was made to hide the tediousness of having to retrieve and check
    * for an `Actor` each time the `Utility.wait` function is used.
    *
+   * The Actor `a` is guaranteed to exist at the time `DoSomething` is
+   * executed. If the function is not executed it means `a` is no longer
+   * available.
+   *
    * @param a `Actor` to work on.
-   * @param time Time to wait.
+   * @param time Time to wait (seconds).
    * @param DoSomething What to do when the time has passed.
    */
   export function WaitActor(
@@ -497,11 +550,28 @@ export namespace FormLib {
     f()
   }
 
+  /** Tries to do something on an `Actor` on each slot mask.
+   * @param  {Actor|null} a Actor to work on.
+   * @param  {(slot:number)=>void} DoSomething What to do on each slot mask.
+   */
+  export function ForEachSlotMask(
+    a: Actor | null,
+    DoSomething: (slot: number) => void
+  ) {
+    if (!a) return
+    for (let i = SlotMask.Head; i < SlotMask.FX01; i *= 2) {
+      DoSomething(i)
+    }
+  }
+
   /** Does something for each `Armor` an `Actor` has equipped.
    *
    * @param a Actor to check.
    * @param DoSomething What to do when an equipped armor is found.
    */
+  // * Notice how this function doesn't use ForEachEquippedSlotMask.
+  // * That's because this function is used quite a lot in real time
+  // * and it's better to help it be faster, even if it's only one bit.
   export function ForEachEquippedArmor(
     a: Actor | null,
     DoSomething: (arm: Armor) => void
@@ -566,6 +636,19 @@ export namespace FormLib {
       f(o.getNthForm(i))
     }
   }
+
+  /** Iterates over all items belonging to some `ObjectReference`, from last to first.
+   *
+   * @param o - The object reference to iterate over.
+   * @param f - Function applied to each item.
+   */
+  export function ForEachItemREx(o: ObjectReference, f: (item: Form) => void) {
+    ForEachItemR(o, (item) => {
+      if (!item) return
+      f(item)
+    })
+  }
+
   /** Iterates over all keywords belonging to some `Form`, from last to first.
    *
    * @param o - The form to iterate over.
@@ -650,13 +733,11 @@ export namespace FormLib {
 
   /** Gets the esp a form belongs to.
    *
-   * @remarks
-   * This code was adapted from `GetFormIdentifier` in FileUtils.cpp
-   * in SKEE64 (RaceMenu dll); line 177.
-   *
    * @param form Form to get the esp from.
    * @returns Name and type of the esp file he form belongs to.
    */
+  // * This code was adapted from `GetFormIdentifier` in FileUtils.cpp
+  // * in SKEE64 (RaceMenu dll); line 177.
   export function GetFormEsp(form: Form | null | undefined): FormEspInfo {
     const nil = { name: "", type: ModType.unknown }
     if (!form) return nil
@@ -751,20 +832,20 @@ export namespace FormLib {
    * @param  {(msg:string)=>void} Logger? Function to log an error if a new chest couldn't be created.
    *
    * @example
-   *   // This uses a JContainers database to know what chest is being created
-   *   const path = "some.JContainers.path"
-   *   const h = GetSomeJContainersHandle(path)
-   *   const someForm = Game.getFormEx(0x14)
+   * // This uses a JContainers database to know what chest is being created
+   * const path = "some.JContainers.path"
+   * const h = GetSomeJContainersHandle(path)
+   * const someForm = Game.getFormEx(0x14)
    *
-   *   const Getter = () => {
-   *     return JFormMap.getForm(h, someForm)
-   *   }
-   *   const Setter = (frm: Form | null | undefined) => {
-   *     JFormMap.setForm(h, someForm, frm)
-   *     SaveSomeJContainersHandle(h, path)
-   *   }
+   * const Getter = () => {
+   *   return JFormMap.getForm(h, someForm)
+   * }
+   * const Setter = (frm: Form | null | undefined) => {
+   *   JFormMap.setForm(h, someForm, frm)
+   *   SaveSomeJContainersHandle(h, path)
+   * }
    *
-   *   const chest = FormLib.GetPersistentChest(Getter, Setter, printConsole)
+   * const chest = FormLib.GetPersistentChest(Getter, Setter, printConsole)
    */
   export function GetPersistentChest(
     Getter: () => Form | null,
@@ -779,6 +860,7 @@ export namespace FormLib {
           "Could not create a persistent chest in Tamriel. " +
           "Are you using a mod that substantially changes the game?"
         if (Logger) Logger(msg)
+        else printConsole(msg)
         return null
       }
       frm = Game.getFormEx(newChest)
