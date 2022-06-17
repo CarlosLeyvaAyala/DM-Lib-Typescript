@@ -784,6 +784,16 @@ export namespace FormLib {
     return { modName: esp.name, type: esp.type, fixedFormId: id }
   }
 
+  /** Returns a string in the `PluginName|0xHexFormID` format.
+   * @param  {string} espName
+   * @param  {number} fixedFormId
+   *
+   * @remarks
+   * This is used by default by {@link GetFormUniqueId}.
+   */
+  export const DefaultUIdFmt = (espName: string, fixedFormId: number) =>
+    `${espName}|0x${fixedFormId.toString(16)}`
+
   /** Returns a string that can be used as an unique `Form` identifier.
    *
    * @param form The `Form` to generate data for.
@@ -792,15 +802,51 @@ export namespace FormLib {
    *
    * @example
    * const b = Game.getFormEx(0x03003012)
-   * const uId = GetFormUniqueId(b, (e, i) => `${e}|0x${i.toString(16)}`) // => "Hearthfires.esm|0x3012"
+   * const uId = GetFormUniqueId(b) // => "Hearthfires.esm|0x3012"
+   * const uId2 = GetFormUniqueId(b, (e, i) => `${e}|0x${i.toString(16)}`) // => "Hearthfires.esm|0x3012"
    */
   export function GetFormUniqueId(
     form: Form | null | undefined,
-    format: (name: string, fixedFormId: number, type?: ModType) => string
+    format: (
+      espName: string,
+      fixedFormId: number,
+      type?: ModType
+    ) => string = DefaultUIdFmt
   ): string {
     if (!form) return "Undefined form"
     const d = GetFormEspAndId(form)
     return format(d.modName, d.fixedFormId, d.type)
+  }
+
+  /** Returns a `Form` from a string.
+   * @param  {string} uId Unique FormID to get the `Form` from.
+   * @param  {RegExp} fmt Regular expression to get the `Form` from.
+   * @param  {number} espGroup In which group from the RegExp the Plugin file is expected to be.
+   * @param  {number} formIdGroup In which group from the RegExp the FormID is expected to be.
+   *
+   * @remarks
+   * This function uses `Game.getFormFromFile`, so it expects the Unique FormID to have
+   * a relative FormID and a plugin name.
+   *
+   * With its default parameters, it recognizes unique ids in the format:
+   *      `PluginName|0xHexFormID`
+   *
+   * @example
+   * const VendorItemOreIngot = GetFormFromUniqueId("Skyrim.esm|0x914ec")
+   * const NullForm = GetFormFromUniqueId("Skyrim.esm|595180")  // Not a valid hex id
+   * const OreIngotAgain = GetFormFromUniqueId("595180-Skyrim.esm", /(\d+)-(.*)/, 2, 1)
+   */
+  export function GetFormFromUniqueId(
+    uId: string,
+    fmt: RegExp = /(.*)\|(0[xX].*)/,
+    espGroup: number = 1,
+    formIdGroup: number = 2
+  ) {
+    const m = uId.match(fmt)
+    if (!m) return null
+    const esp = m[espGroup]
+    const formId = Number(m[formIdGroup])
+    return Game.getFormFromFile(formId, esp)
   }
 
   /** Creates a persistent chest hidden somewhere in Tamriel.
