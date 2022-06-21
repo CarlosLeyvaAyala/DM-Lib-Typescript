@@ -550,6 +550,21 @@ export namespace FormLib {
     f()
   }
 
+  export function WaitForm(
+    f: Form,
+    time: number,
+    DoSomething: (act: Form) => void
+  ) {
+    const Frm = PreserveForm(f)
+    const F = async () => {
+      await Utility.wait(time)
+      const frm = Frm()
+      if (!frm) return
+      DoSomething(frm)
+    }
+    F()
+  }
+
   /** Tries to do something on an `Actor` on each slot mask.
    * @param  {Actor|null} a Actor to work on.
    * @param  {(slot:number)=>void} DoSomething What to do on each slot mask.
