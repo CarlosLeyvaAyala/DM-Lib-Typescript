@@ -22,10 +22,8 @@ import {
   SlotMask,
   SoulGem,
   storage,
-  TESModPlatform,
   Utility,
   Weapon,
-  WorldSpace,
   writeLogs,
 } from "skyrimPlatform"
 
@@ -459,13 +457,14 @@ export namespace FormLib {
   /** Gets the player as an `Actor`.
    *
    * @remarks
-   * `Game.getPlayer()` is guaranteed to get an `Actor` in Skyrim Platform, so it's
-   * ok to do `Game.getPlayer() as Actor`.
-   *
    * This function is intended to be used as a callback when you are defining functions that
    * need the player, but
    * {@link https://github.com/skyrim-multiplayer/skymp/blob/main/docs/skyrim_platform/native.md#native-functions game functions are not available}
    * when defining them.
+   *
+   * @privateRemarks
+   * `Game.getPlayer()` is guaranteed to get an `Actor` in Skyrim Platform, so it's
+   * ok to do `Game.getPlayer() as Actor`.
    */
   export const Player = () => Game.getPlayer() as Actor
 
@@ -636,34 +635,6 @@ export namespace FormLib {
     return nonRepeated ? GetNonRepeated() : all
   }
 
-  /** Iterates over all items belonging to some `ObjectReference`, from last to first.
-   *
-   * @param o - The object reference to iterate over.
-   * @param f - Function applied to each item.
-   */
-  export function ForEachItemR(
-    o: ObjectReference,
-    f: (item: Form | null) => void
-  ) {
-    let i = o.getNumItems()
-    while (i > 0) {
-      i--
-      f(o.getNthForm(i))
-    }
-  }
-
-  /** Iterates over all items belonging to some `ObjectReference`, from last to first.
-   *
-   * @param o - The object reference to iterate over.
-   * @param f - Function applied to each item.
-   */
-  export function ForEachItemREx(o: ObjectReference, f: (item: Form) => void) {
-    ForEachItemR(o, (item) => {
-      if (!item) return
-      f(item)
-    })
-  }
-
   /** Iterates over all keywords belonging to some `Form`, from last to first.
    *
    * @param o - The form to iterate over.
@@ -698,19 +669,6 @@ export namespace FormLib {
       const ii = o.getNthPart(i)
       if (ii) f(ii)
     }
-  }
-
-  /** Iterates over all armors belonging to some `ObjectReference`, from last to first.
-   *
-   * @param o - The object reference to iterate over.
-   * @param f - Function applied to each armor.
-   */
-  export function ForEachArmorR(o: ObjectReference, f: (armor: Armor) => void) {
-    ForEachItemR(o, (i) => {
-      const a = Armor.from(i)
-      if (!a) return
-      f(a)
-    })
   }
 
   /** Iterates over all forms of `formType` in some `cell`.
@@ -832,104 +790,6 @@ export namespace FormLib {
     const d = GetFormEspAndId(form)
     return format(d.modName, d.fixedFormId, d.type)
   }
-
-  /** Returns a `Form` from a string.
-   * @param  {string} uId Unique FormID to get the `Form` from.
-   * @param  {RegExp} fmt Regular expression to get the `Form` from.
-   * @param  {number} espGroup In which group from the RegExp the Plugin file is expected to be.
-   * @param  {number} formIdGroup In which group from the RegExp the FormID is expected to be.
-   *
-   * @remarks
-   * This function uses `Game.getFormFromFile`, so it expects the Unique FormID to have
-   * a relative FormID and a plugin name.
-   *
-   * With its default parameters, it recognizes unique ids in the format:
-   *      `PluginName|0xHexFormID`
-   *
-   * @example
-   * const VendorItemOreIngot = GetFormFromUniqueId("Skyrim.esm|0x914ec")
-   * const NullForm = GetFormFromUniqueId("Skyrim.esm|595180")  // Not a valid hex id
-   * const OreIngotAgain = GetFormFromUniqueId("595180-Skyrim.esm", /(\d+)-(.*)/, 2, 1)
-   */
-  export function GetFormFromUniqueId(
-    uId: string,
-    fmt: RegExp = /(.*)\|(0[xX].*)/,
-    espGroup: number = 1,
-    formIdGroup: number = 2
-  ) {
-    const m = uId.match(fmt)
-    if (!m) return null
-    const esp = m[espGroup]
-    const formId = Number(m[formIdGroup])
-    return Game.getFormFromFile(formId, esp)
-  }
-
-  /** Creates a persistent chest hidden somewhere in Tamriel.
-   *
-   * @remarks
-   * This chest can be used as a permanent storage that never resets.
-   *
-   * Because of the way things are created in Skyrim, we need to get an object reference first.
-   *
-   * @returns The FormId of the recently created chest. `null` if no chest could be created.
-   */
-  export function CreatePersistentChest() {
-    // Spawn chest at player's location
-    const p = Game.getPlayer() as Actor
-    const c = p.placeAtMe(Game.getFormEx(0x70479), 1, true, false)
-    if (!c) return null
-
-    // Move the chest to Tamriel
-    const world = WorldSpace.from(Game.getFormEx(0x3c))
-    TESModPlatform.moveRefrToPosition(c, null, world, 0, 0, -10000, 0, 0, 0)
-
-    return c.getFormID()
-  }
-  /** Tries to get a persistent chest defined in some place and creates a new
-   * one if it doesn't exist.
-   *
-   * @param  {()=>Form|null|undefined} Getter Function that gets an already existing chest.
-   * @param  {(frm:Form|null|undefined)=>void} Setter Function that saves a newly created chest.
-   * @param  {(msg:string)=>void} Logger? Function to log an error if a new chest couldn't be created.
-   *
-   * @example
-   * // This uses a JContainers database to know what chest is being created
-   * const path = "some.JContainers.path"
-   * const h = GetSomeJContainersHandle(path)
-   * const someForm = Game.getFormEx(0x14)
-   *
-   * const Getter = () => {
-   *   return JFormMap.getForm(h, someForm)
-   * }
-   * const Setter = (frm: Form | null | undefined) => {
-   *   JFormMap.setForm(h, someForm, frm)
-   *   SaveSomeJContainersHandle(h, path)
-   * }
-   *
-   * const chest = FormLib.GetPersistentChest(Getter, Setter, printConsole)
-   */
-  export function GetPersistentChest(
-    Getter: () => Form | null,
-    Setter: (frm: Form | null) => void,
-    Logger?: (msg: string) => void
-  ) {
-    let frm = Getter()
-    if (!frm) {
-      const newChest = FormLib.CreatePersistentChest()
-      if (!newChest) {
-        const msg =
-          "Could not create a persistent chest in Tamriel. " +
-          "Are you using a mod that substantially changes the game?"
-        if (Logger) Logger(msg)
-        else printConsole(msg)
-        return null
-      }
-      frm = Game.getFormEx(newChest)
-      Setter(frm)
-    }
-    return frm
-  }
-
   /** Returns wether an `ObjectReference` is an alchemy lab.
    * @param  {ObjectReference} furniture The furniture to check.
    *
