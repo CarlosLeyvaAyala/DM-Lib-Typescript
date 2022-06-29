@@ -1,4 +1,4 @@
-import { Form, ObjectReference } from "skyrimPlatform"
+import { Form, ObjectReference, Utility } from "skyrimPlatform"
 
 /**
  * Iterates over all items belonging to some `ObjectReference`, from last to first.
@@ -34,4 +34,30 @@ export function forEachItem(o: ObjectReference, f: (item: Form) => void) {
     if (!item) return
     f(item)
   })
+}
+
+/**
+ * Iterates over all items belonging to some `ObjectReference`, from last to first. Waits
+ * some time before each operation.
+ *
+ * @param o - The object reference to iterate over.
+ * @param wait - Time (seconds) to wait.
+ * @param f - Function applied to each item.
+ */
+export function forEachItemW(
+  o: ObjectReference,
+  wait: number,
+  f: (item: Form) => void
+) {
+  const A = async () => {
+    let i = o.getNumItems()
+    while (i > 0) {
+      i--
+      const item = o.getNthForm(i)
+      if (!item) return
+      f(item)
+      Utility.wait(wait)
+    }
+  }
+  A()
 }

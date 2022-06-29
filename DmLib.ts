@@ -451,23 +451,6 @@ export namespace Combinators {
 
 /** Functions related to `Forms`. */
 export namespace FormLib {
-  /** Player FormId. */
-  export const playerId = 0x14
-
-  /** Gets the player as an `Actor`.
-   *
-   * @remarks
-   * This function is intended to be used as a callback when you are defining functions that
-   * need the player, but
-   * {@link https://github.com/skyrim-multiplayer/skymp/blob/main/docs/skyrim_platform/native.md#native-functions game functions are not available}
-   * when defining them.
-   *
-   * @privateRemarks
-   * `Game.getPlayer()` is guaranteed to get an `Actor` in Skyrim Platform, so it's
-   * ok to do `Game.getPlayer() as Actor`.
-   */
-  export const Player = () => Game.getPlayer() as Actor
-
   export const enum ItemType {
     None,
     Weapon,
