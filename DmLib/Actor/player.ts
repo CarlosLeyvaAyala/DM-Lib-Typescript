@@ -1,4 +1,4 @@
-import { Actor, Game } from "skyrimPlatform"
+import { Actor, Game, ObjectReference } from "skyrimPlatform"
 
 /** Player FormId. */
 export const playerId = 0x14
@@ -16,3 +16,13 @@ export const playerId = 0x14
  * ok to do `Game.getPlayer() as Actor`.
  */
 export const Player = () => Game.getPlayer() as Actor
+
+/**
+ * Is an object the player?
+ * @param a Object to be tested.
+ * @returns Wether the object is the player.
+ */
+export function isPlayer(a: Actor | ObjectReference | null) {
+  if (!a) return false
+  return a.getFormID() === playerId
+}

@@ -492,61 +492,6 @@ export namespace FormLib {
     return ItemType.None
   }
 
-  export function PreserveForm(frm: Form | null) {
-    if (!frm) return () => null
-    const id = frm.getFormID()
-    return () => Game.getFormEx(id)
-  }
-
-  export function PreserveActor(a: Actor | null) {
-    const f = PreserveForm(a)
-    return () => Actor.from(f())
-  }
-
-  /** Does something to an `Actor` after some time has passed.
-   *
-   * @remarks
-   * This was made to hide the tediousness of having to retrieve and check
-   * for an `Actor` each time the `Utility.wait` function is used.
-   *
-   * The Actor `a` is guaranteed to exist at the time `DoSomething` is
-   * executed. If the function is not executed it means `a` is no longer
-   * available.
-   *
-   * @param a `Actor` to work on.
-   * @param time Time to wait (seconds).
-   * @param DoSomething What to do when the time has passed.
-   */
-  export function WaitActor(
-    a: Actor,
-    time: number,
-    DoSomething: (act: Actor) => void
-  ) {
-    const actor = PreserveActor(a)
-    const f = async () => {
-      await Utility.wait(time)
-      const act = actor()
-      if (!act) return
-      DoSomething(act)
-    }
-    f()
-  }
-
-  export function WaitForm(
-    f: Form,
-    time: number,
-    DoSomething: (act: Form) => void
-  ) {
-    const Frm = PreserveForm(f)
-    const F = async () => {
-      await Utility.wait(time)
-      const frm = Frm()
-      if (!frm) return
-      DoSomething(frm)
-    }
-    F()
-  }
-
   /** Tries to do something on an `Actor` on each slot mask.
    * @param  {Actor|null} a Actor to work on.
    * @param  {(slot:number)=>void} DoSomething What to do on each slot mask.
