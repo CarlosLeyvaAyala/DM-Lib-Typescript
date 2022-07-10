@@ -60,7 +60,7 @@ export function createPersistentChest() {
  * const Getter = () => {
  *   return JFormMap.getForm(h, someForm)
  * }
- * const Setter = (frm: Form | null | undefined) => {
+ * const Setter = (frm: Form | null) => {
  *   JFormMap.setForm(h, someForm, frm)
  *   SaveSomeJContainersHandle(h, path)
  * }
