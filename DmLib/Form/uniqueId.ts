@@ -69,7 +69,7 @@ export function getEspAndId(form: Form | null) {
  * @param  {number} fixedFormId
  *
  * @remarks
- * This is used by default by {@link getFormUniqueId}.
+ * This is used by default by {@link getUniqueId}.
  */
 export const defaultUIdFmt = (espName: string, fixedFormId: number) =>
   `${espName}|0x${fixedFormId.toString(16)}`
@@ -93,7 +93,7 @@ export function getUniqueId(
     type?: ModType
   ) => string = defaultUIdFmt
 ): string {
-  if (!form) return "Undefined form"
+  if (!form) return "Null form"
   const d = getEspAndId(form)
   return format(d.modName, d.fixedFormId, d.type)
 }
