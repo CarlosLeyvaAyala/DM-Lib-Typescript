@@ -619,105 +619,6 @@ export namespace FormLib {
     }
   }
 
-  /** In what space is the mod loaded in? */
-  export const enum ModType {
-    esp,
-    esl,
-    unknown,
-  }
-
-  /** Info a `Form` gets about its esp. */
-  export interface FormEspInfo {
-    name: string
-    type: ModType
-  }
-
-  /** Gets the esp a form belongs to.
-   *
-   * @param form Form to get the esp from.
-   * @returns Name and type of the esp file he form belongs to.
-   */
-  // * This code was adapted from `GetFormIdentifier` in FileUtils.cpp
-  // * in SKEE64 (RaceMenu dll); line 177.
-  export function GetFormEsp(form: Form | null | undefined): FormEspInfo {
-    const nil = { name: "", type: ModType.unknown }
-    if (!form) return nil
-
-    const formId = form.getFormID()
-    const modIndex = formId >>> 24
-
-    if (modIndex == 0xfe) {
-      const lightIndex = (formId >>> 12) & 0xfff
-      if (lightIndex < Game.getLightModCount())
-        return { name: Game.getLightModName(lightIndex), type: ModType.esl }
-    } else return { name: Game.getModName(modIndex), type: ModType.esp }
-
-    return nil
-  }
-
-  /** Adapter to change a {@link FormEspInfo} to `undefined` if needed. */
-  export const FormEspInfoToUndef = (d: FormEspInfo) =>
-    d.type === ModType.unknown ? { name: undefined, type: undefined } : d
-
-  /** Returns the relative `formId` of some `Form`.
-   *
-   * @param form The `Form` to get the relative `formId` from.
-   * @param modType Does the `Form` belong to an esp or esl file?
-   * @returns Fixed `formId`. `-1` if `form` or `modType` are invalid.
-   */
-  export function GetFixedFormId(
-    form: Form | null | undefined,
-    modType: ModType
-  ) {
-    if (!form || modType === ModType.unknown) return -1
-    const id = form.getFormID()
-    return modType === ModType.esp ? id & 0xffffff : id & 0xfff
-  }
-
-  /** Returns the esp file, type and fixed formId for a `Form`.
-   *
-   * @param form `Form` to get data from.
-   * @returns An object with all data.
-   */
-  export function GetFormEspAndId(form: Form | null | undefined) {
-    const esp = GetFormEsp(form)
-    const id = GetFixedFormId(form, esp.type)
-    return { modName: esp.name, type: esp.type, fixedFormId: id }
-  }
-
-  /** Returns a string in the `PluginName|0xHexFormID` format.
-   * @param  {string} espName
-   * @param  {number} fixedFormId
-   *
-   * @remarks
-   * This is used by default by {@link GetFormUniqueId}.
-   */
-  export const DefaultUIdFmt = (espName: string, fixedFormId: number) =>
-    `${espName}|0x${fixedFormId.toString(16)}`
-
-  /** Returns a string that can be used as an unique `Form` identifier.
-   *
-   * @param form The `Form` to generate data for.
-   * @param format The function that will be used to give format to the result of this function.
-   * @returns A unique `string` identifier based on fixed formId and esp file data.
-   *
-   * @example
-   * const b = Game.getFormEx(0x03003012)
-   * const uId = GetFormUniqueId(b) // => "Hearthfires.esm|0x3012"
-   * const uId2 = GetFormUniqueId(b, (e, i) => `${e}|0x${i.toString(16)}`) // => "Hearthfires.esm|0x3012"
-   */
-  export function GetFormUniqueId(
-    form: Form | null | undefined,
-    format: (
-      espName: string,
-      fixedFormId: number,
-      type?: ModType
-    ) => string = DefaultUIdFmt
-  ): string {
-    if (!form) return "Undefined form"
-    const d = GetFormEspAndId(form)
-    return format(d.modName, d.fixedFormId, d.type)
-  }
   /** Returns wether an `ObjectReference` is an alchemy lab.
    * @param  {ObjectReference} furniture The furniture to check.
    *
@@ -1696,16 +1597,21 @@ export namespace AnimLib {
     IdleBedExitStart = "IdleBedExitStart",
     IdleBedLeftEnterStart = "IdleBedLeftEnterStart",
     IdleBlacksmithForgeEnter = "IdleBlacksmithForgeEnter",
+    IdleBlackSmithingEnterStart = "IdleBlackSmithingEnterStart",
     IdleCarryBucketPourEnter = "IdleCarryBucketPourEnter",
+    IdleChairExitStart = "IdleChairExitStart",
     IdleChairFrontEnter = "IdleChairFrontEnter",
     IdleChairShoulderFlex = "idleChairShoulderFlex",
     IdleCounterStart = "IdleCounterStart",
     IdleEnchantingEnter = "IdleEnchantingEnter",
     IdleExamine = "IdleExamine",
     IdleFeedChicken = "IdleFeedChicken",
+    IdleFurnitureExitSlow = "IdleFurnitureExitSlow",
+    IdleHammerCarpenterTableEnter = "IdleHammerCarpenterTableEnter",
     IdleLeanTableEnter = "IdleLeanTableEnter",
     IdleLooseSweepingStart = "idleLooseSweepingStart",
     IdleSharpeningWheelStart = "IdleSharpeningWheelStart",
+    IdleSmelterEnter = "IdleSmelterEnter",
     IdleStop = "IdleStop",
     IdleStopInstant = "IdleStopInstant",
     IdleTanningEnter = "IdleTanningEnter",
