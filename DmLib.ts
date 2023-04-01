@@ -349,105 +349,7 @@ export namespace MathLib {
  * - https://tgdwyer.github.io/
  * - https://leanpub.com/javascriptallongesix/read#leanpub-auto-making-data-out-of-functions
  */
-export namespace Combinators {
-  /** Returns whatever it's passed to it.
-   *
-   * @param x
-   * @returns x
-   *
-   * @remarks
-   * **This is NOT STUPID**. It's useful, for example, for feeding it to
-   * functions that may transform values, but we don't want to transform
-   * something in particular.
-   *
-   * It's not much useful by itself, but you will soon see its value
-   * when you start composing functions.
-   *
-   * @see {@link K} for other uses.
-   *
-   * @example
-   * const lower = (x: string) => x.toLowerCase()
-   * const upper = (x: string) => x.toUpperCase()
-   * const f = (x: string, g: (x: string) => string) => g(x)
-   *
-   * const x = f("LOWER", lower)
-   * const y = f("upper", upper)
-   * const z = f("sAmE", I)
-   */
-  export const I = <T>(x: T) => x
-
-  /** Returns a function that accepts one parameter, but ignores it and returns whatever
-   * you originally defined it with.
-   *
-   * @param x
-   * @returns `function (y: any) => x`
-   *
-   * @remarks
-   * This can be used to make a function constant; that is, no matter what you
-   * pass to it, it will always returns the value you first defined it with.
-   * This is useful to plug constants into places that are expecting functions.
-   *
-   * If combined with {@link I} it can do useful things. `K(I)` will always
-   * return the second parameter you pass to it.
-   *
-   * Combined with {@link O} can be used to make one liners that ensure a calculated value
-   * is always returned.
-   *
-   * @see {@link O} for more uses.
-   *
-   * @example
-   * const first = K
-   * const second = k(I)
-   * first("primero")("segundo")    // => "primero"
-   * second("primero")("segundo")   // => "segundo"
-   *
-   * const msg = K("You are a moron")
-   * const validate = (x: number) => (typeof x !== "number" ? null : x.toString())
-   * const intToStr = O(validate, msg)
-   * intToStr(null)   // => "You are a moron"
-   * intToStr(32)     // => 32
-   *
-   * const guaranteedActorBase = O((a: Actor) => a.getLeveledActorBase(), K(Game.getPlayer()?.getBaseObject()))
-   * guaranteedActorBase(null)              // => player
-   * guaranteedActorBase(whiterunGuard)     // => Whiterun Guard
-   */
-  export const K =
-    <T>(x: T) =>
-    (y: any): T =>
-      x
-
-  /** Creates a function that accepts one parameter `x`. Returns `f1(x)` if not `null`, else `f2(x)`.
-   *
-   * @param f1 First function to apply.
-   * @param f2 Second function to apply.
-   * @returns `f1(x)` if not `null`, else `f2(x)`.
-   */
-  export const O =
-    <U>(f1: (...args: any[]) => U | null, f2: (...args: any[]) => U) =>
-    (...args: any[]): U =>
-      f1(...args) || f2(...args)
-
-  /** Applies function `f` to `x` and returns `x`. Useful for chaining functions that return nothing.
-   *
-   * @param x
-   * @param f
-   * @returns x
-   */
-  export function Tap<K>(x: K, f: (x: K) => void) {
-    f(x)
-    return x
-  }
-
-  /** Returns a value while executing a function.
-   *
-   * @see {@link DebugLib.Log.R} for a sample usage.
-   *
-   * @param f Function to execute.
-   * @param x Value to return.
-   * @returns `x`
-   */
-  export const Return = <T>(f: void, x: T) => Tap(x, K(f))
-}
+export namespace Combinators {}
 
 /** Functions related to `Forms`. */
 export namespace FormLib {
@@ -713,22 +615,6 @@ export namespace Misc {
     }
   }
 
-  /** Adapts a JContainers saving function so it can be used with {@link PreserveVar}.
-   *
-   * @param f Function to adapt.
-   * @returns A function that accepts a key and a value.
-   *
-   * @example
-   * const SaveFlt = JContainersToPreserving(JDB.solveFltSetter)
-   * const SaveInt = JContainersToPreserving(JDB.solveIntSetter)
-   */
-  export function JContainersToPreserving<T>(
-    f: (k: string, v: T, b?: boolean) => void
-  ) {
-    return (k: string, v: T) => {
-      f(k, v, true)
-    }
-  }
   /** Adapts a PapyrusUtil saving function so it can be used with {@link PreserveVar}.
    *
    * @param f Function to adapt.
@@ -745,40 +631,6 @@ export namespace Misc {
   ) {
     return (k: string, v: T) => {
       f(obj, k, v)
-    }
-  }
-
-  /** Saves a variable to both storage and wherever the `Store` function saves it.
-   *
-   * @remarks
-   * The `storage` variable saves values across hot reloads, but not game sessions.
-   *
-   * At the time of creating this function, Skyrim Platform doesn't implement any
-   * way of saving variables to the SKSE co-save, so values aren't preserved across
-   * save game saves.
-   *
-   * This function lets us save variables using wrapped functions from either
-   * **JContainers** or **PapyursUtil**.
-   *
-   * @param Store A function that saves a variable somewhere.
-   * @param k `string` key to identify where the variable will be saved.
-   * @returns A fuction that saves a value and returns it.
-   *
-   * @example
-   * const SaveFlt = JContainersToPreserving(JDB.solveFltSetter)
-   * const SaveInt = JContainersToPreserving(JDB.solveIntSetter)
-   * const SFloat = PreserveVar(SaveFlt, "floatKey")
-   * const SInt = PreserveVar(SaveInt, "intKey")
-   *
-   * // Use SFloat each time we want to make sure a value won't get lost when reloading the game.
-   * let x = SFloat(10)   // => x === 10
-   * x = SFloat(53.78)    // => x === 53.78
-   */
-  export function PreserveVar<T>(Store: (k: string, v: T) => void, k: string) {
-    return (x: T) => {
-      storage[k] = x
-      Store(k, x)
-      return x
     }
   }
 
@@ -1488,7 +1340,7 @@ export namespace DebugLib {
       }
     }
 
-    const C = Combinators
+    // const C = Combinators
 
     /** Returns `x` while executing a logging function. `R` means _[R]eturn_.
      *
@@ -1509,7 +1361,7 @@ export namespace DebugLib {
      * const x = R(Msg("number"), 2)       // => "This is a number"; x === 2
      * const s = R(Msg("string"), "noob")  // => "This is a string"; s === "noob"
      */
-    export const R = C.Return
+    // export const R = C.Return
 
     /** Converts an integer to hexadecimal notation.
      *
