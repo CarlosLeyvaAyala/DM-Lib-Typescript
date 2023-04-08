@@ -1245,17 +1245,18 @@ export namespace DebugLib {
       ConsoleFmt?: LogFormat,
       FileFmt?: LogFormat
     ): LoggingFunction {
-      return function (msg: any) {
-        const canLog =
-          currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt)
-        if (!canLog) return
+      const canLog =
+        currLogLvl >= logAt || (currLogLvl < 0 && currLogLvl === logAt)
 
-        const t = new Date()
-        if (ConsoleFmt)
-          printConsole(ConsoleFmt(currLogLvl, logAt, modName, t, msg))
-        if (FileFmt)
-          writeLogs(modName, FileFmt(currLogLvl, logAt, modName, t, msg))
-      }
+      if (!canLog) return (_: any) => {}
+      else
+        return function (msg: any) {
+          const t = new Date()
+          if (ConsoleFmt)
+            printConsole(ConsoleFmt(currLogLvl, logAt, modName, t, msg))
+          if (FileFmt)
+            writeLogs(modName, FileFmt(currLogLvl, logAt, modName, t, msg))
+        }
     }
 
     /** Creates all functions at all logging levels with their corresponding Tapped counterparts.
