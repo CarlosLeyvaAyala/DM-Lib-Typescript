@@ -27,75 +27,6 @@ import {
   writeLogs,
 } from "skyrimPlatform"
 
-/** Time related functions. */
-export namespace TimeLib {
-  /** Ratio to convert Skyrim hours to human hours. */
-  const gameHourRatio = 1.0 / 24.0
-
-  /** Current time in {@link SkyrimHours}. */
-  export const Now: () => SkyrimHours = Utility.getCurrentGameTime
-
-  /** Hours as a fraction of a day; where 1.0 == 24 hours. */
-  export type SkyrimHours = number
-
-  /** Hours as humans use them; where 24 == 1.0 days. */
-  export type HumanHours = number
-
-  /** Minutes as humans use them; where `1 == 0.00069444` Skyrim days. */
-  export type HumanMinutes = number
-
-  /** Changes {@link SkyrimHours} to {@link HumanHours}.
-   *
-   * @param x Time in {@link SkyrimHours}.
-   * @returns Time in human readable hours.
-   *
-   * @example
-   * ToHumanHours(2.0)   // => 48. Two full days
-   * ToHumanHours(0.5)   // => 12. Half a day
-   */
-  export const ToHumanHours = (x: SkyrimHours): HumanHours => x / gameHourRatio
-
-  /** Converts a {@link SkyrimHours} to a `string` in {@link HumanHours}. */
-  export const ToHumanHoursStr = (x: SkyrimHours) => ToHumanHours(x).toString()
-
-  /** Converts a time in minutes to hours. */
-  export const MinutesToHours = (x: number) => x / 60
-
-  /** Converts a time in hours to minutes. */
-  export const HoursToMinutes = (x: number) => x * 60
-
-  /** Converts {@link HumanHours} to {@link SkyrimHours}.
-   *
-   * @param x Time in human readable hours.
-   * @returns Time in {@link SkyrimHours}.
-   *
-   * @example
-   * ToHumanHours(48)   // => 2.0. Two full days
-   * ToHumanHours(12)   // => 0.5. Half a day
-   */
-  export const ToSkyrimHours = (x: HumanHours): SkyrimHours => x * gameHourRatio
-
-  /** Returns in human hours how much time has passed between `Now` and some hour given
-   * in {@link SkyrimHours}.
-   * @param then {@link SkyrimHours}
-   * @returns Hour span in {@link HumanHours}
-   */
-  export const HourSpan = (then: SkyrimHours): HumanHours =>
-    ToHumanHours(Now() - then)
-
-  /** Converts {@link HumanMinutes} to {@link SkyrimHours}.
-   * @param  {number} x Minutes to convert.
-   */
-  export const MinutesToSkyrimHours = (x: HumanMinutes) =>
-    ToSkyrimHours(MinutesToHours(x))
-
-  /** Converts {@link SkyrimHours} to {@link HumanMinutes}.
-   * @param  {number} x Minutes to convert.
-   */
-  export const SkyrimHoursToHumanMinutes = (x: SkyrimHours) =>
-    HoursToMinutes(ToHumanHours(x))
-}
-
 /** Math related functions. */
 export namespace MathLib {
   /** Returns a function that ensures some value is at least `min`.
@@ -393,47 +324,6 @@ export namespace MapLib {
 
 /** Miscelaneous functions that don't belong to other categories. */
 export namespace Misc {
-  /** Avoids a function to be executed many times at the same time.
-   *
-   * @param f The function to wrap.
-   * @returns A function that will be called only once when the engine
-   * tries to spam it.
-   *
-   * @remarks
-   * Sometimes the engine is so fast a function may be called many times
-   * in a row. For example, the `OnSleepStart` event may be fired 4 times
-   * in a row, thus executing a function those 4 times, even when it was
-   * intended to run only once.
-   *
-   * This function will make a function in that situation to be called
-   * only once, as expected.
-   *
-   * @warning
-   * Since this function is a "closure" it needs to be used outside loops
-   * and things that may redefine the inner variables inside it.
-   *
-   * If this function doesn't appear to work, try to use it outside the
-   * current execution block.
-   *
-   * @example
-   * let f = () => { printConsole("Only once") }
-   * f = AvoidRapidFire(f)
-   *
-   * // The engine is so fast this will actually work
-   * f()
-   * f()
-   * f()
-   */
-  export function AvoidRapidFire(f: () => void) {
-    let lastExecuted = 0
-    return () => {
-      const t = TimeLib.Now()
-      if (lastExecuted === t) return
-      lastExecuted = t
-      f()
-    }
-  }
-
   /** Adapts a PapyrusUtil saving function so it can be used with {@link PreserveVar}.
    *
    * @param f Function to adapt.
