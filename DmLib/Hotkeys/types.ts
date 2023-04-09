@@ -1,0 +1,142 @@
+/** Was copied from skyrimPlatform.ts because definitions in there are exported as a `const enum`,
+ * thus making impossible to convert a string `DxScanCode` to number.
+ *
+ * With that setup it was impossible to make {@link fromSettings} to read scan codes as strings.
+ */
+export enum DxScanCode {
+  None,
+  Escape,
+  N1,
+  N2,
+  N3,
+  N4,
+  N5,
+  N6,
+  N7,
+  N8,
+  N9,
+  N0,
+  Minus,
+  Equals,
+  Backspace,
+  Tab,
+  Q,
+  W,
+  E,
+  R,
+  T,
+  Y,
+  U,
+  I,
+  O,
+  P,
+  LeftBracket,
+  RightBracket,
+  Enter,
+  LeftControl,
+  A,
+  S,
+  D,
+  F,
+  G,
+  H,
+  J,
+  K,
+  L,
+  Semicolon,
+  Apostrophe,
+  Console,
+  LeftShift,
+  BackSlash,
+  Z,
+  X,
+  C,
+  V,
+  B,
+  N,
+  M,
+  Comma,
+  Period,
+  ForwardSlash,
+  RightShift,
+  NumMult,
+  LeftAlt,
+  Spacebar,
+  CapsLock,
+  F1,
+  F2,
+  F3,
+  F4,
+  F5,
+  F6,
+  F7,
+  F8,
+  F9,
+  F10,
+  NumLock,
+  ScrollLock,
+  Num7,
+  Num8,
+  Num9,
+  NumMinus,
+  Num4,
+  Num5,
+  Num6,
+  NumPlus,
+  Num1,
+  Num2,
+  Num3,
+  Num0,
+  NumDot,
+  F11 = 87,
+  F12,
+  NumEnter = 156,
+  RightControl,
+  NumSlash = 181,
+  SysRqPtrScr = 183,
+  RightAlt,
+  Pause = 197,
+  Home = 199,
+  UpArrow,
+  PgUp,
+  LeftArrow = 203,
+  RightArrow = 205,
+  End = 207,
+  DownArrow,
+  PgDown,
+  Insert,
+  Delete,
+  LeftMouseButton = 256,
+  RightMouseButton,
+  MiddleMouseButton,
+  MouseButton3,
+  MouseButton4,
+  MouseButton5,
+  MouseButton6,
+  MouseButton7,
+  MouseWheelUp,
+  MouseWheelDown,
+}
+
+export type KeyPressEvt = () => void
+export type KeyHoldEvt = (frames: number) => () => void
+export type Modifier = "Alt" | "Ctrl" | "Shift"
+
+/** Full hotkey structure. */
+export interface Hotkey {
+  hk: DxScanCode
+  modifiers?: Modifiers
+}
+
+/** Possible modifiers a hotkey function can have. */
+export interface Modifiers {
+  shift?: boolean
+  ctrl?: boolean
+  alt?: boolean
+}
+
+export type ListeningFunction = (
+  OnPress?: KeyPressEvt,
+  OnRelease?: KeyPressEvt,
+  OnHold?: KeyHoldEvt
+) => void
