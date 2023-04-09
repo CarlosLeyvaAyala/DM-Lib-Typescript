@@ -1,0 +1,15 @@
+export const enum ItemType {
+  None,
+  Weapon,
+  Ammo,
+  Armor,
+  Potion,
+  Poison,
+  Scroll,
+  Food,
+  Ingredient,
+  Book,
+  Key,
+  Misc,
+  SoulGem,
+}

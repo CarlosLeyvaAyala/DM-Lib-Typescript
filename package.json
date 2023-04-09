@@ -1,0 +1,24 @@
+{
+  "name": "dm-lib-typescript",
+  "version": "0.1.0",
+  "description": "Library for helping developing plugins for Skyrim Platform.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rmdir /s /q \".\\dist\" && mkdir dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarlosLeyvaAyala/DM-Lib-Typescript.git"
+  },
+  "keywords": [],
+  "author": "Carlos Leyva Ayala",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/CarlosLeyvaAyala/DM-Lib-Typescript/issues"
+  },
+  "homepage": "https://github.com/CarlosLeyvaAyala/DM-Lib-Typescript#readme",
+  "files": [
+    "dist/*"
+  ]
+}

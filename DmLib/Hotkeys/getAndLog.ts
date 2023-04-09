@@ -1,6 +1,7 @@
 import { appendT } from "../Debug/Log/appendT"
 import { TappedFunction } from "../Debug/Log/types"
-import { Hotkey, ToString } from "./types"
+import { toString } from "./toString"
+import { Hotkey } from "./types"
 
 /** Creates a function that reads and logs a Hotkey at the same time.
  *
@@ -22,5 +23,5 @@ export function getAndLog(
   appendStr: string = "Hotkey "
 ) {
   const A = appendStr ? appendT(Log, appendStr) : Log
-  return (k: string) => A(k, Get(k), ToString)
+  return (k: string) => A(k, Get(k), toString)
 }

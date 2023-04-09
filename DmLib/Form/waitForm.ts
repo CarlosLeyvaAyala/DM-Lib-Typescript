@@ -1,5 +1,5 @@
 import { Form, Utility } from "skyrimPlatform"
-import { preserveForm } from "preserve"
+import { preserveForm } from "./preserve"
 
 export function waitForm(
   f: Form,

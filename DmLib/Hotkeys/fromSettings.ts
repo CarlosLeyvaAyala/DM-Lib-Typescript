@@ -1,5 +1,5 @@
 import { settings } from "skyrimPlatform"
-import { FromValue } from "./types"
+import { fromValue } from "./fromValue"
 
 /** Gets a hotkey from some configuration file.
  *
@@ -12,4 +12,4 @@ import { FromValue } from "./types"
  */
 
 export const fromSettings = (pluginName: string, optionName: string) =>
-  FromValue(settings[pluginName][optionName])
+  fromValue(settings[pluginName][optionName])

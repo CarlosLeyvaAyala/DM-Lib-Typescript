@@ -1,5 +1,5 @@
 import { Game, Form } from "skyrimPlatform"
-import { FormEspInfo, ModType } from "espData"
+import { FormEspInfo, ModType } from "./espData"
 
 /** Gets the esp a form belongs to.
  *

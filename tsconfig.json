@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "module": "CommonJS",
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": false,
+        "declaration": true,
+        "declarationMap": true,
+        "target": "ES6",
+        "lib": [
+            "ES2017"
+        ],
+        "paths": {
+            "*": [
+                "*",
+            ]
+        },
+        "baseUrl": ".",
+        "outDir": "./dist"
+    },
+    "include": [
+        "./*.ts",
+        "**/DmLib"
+    ],
+    "exclude": [
+        "skyrimPlatform.ts"
+    ],
+}

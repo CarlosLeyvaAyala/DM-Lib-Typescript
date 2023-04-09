@@ -75,3 +75,7 @@ typings/
 # FuseBox cache
 .fusebox/
 *.js
+
+# Distribution
+dist/*
+skyrimPlatform.ts
