@@ -27,78 +27,7 @@ import {
 } from "skyrimPlatform"
 
 /** Math related functions. */
-export namespace MathLib {
-  /** Returns a function that ensures some value is at least `min`.
-   *
-   * @param min The minimum value a number can be.
-   * @returns A function that accepts a number `x` and returns `x` or `min`.
-   *
-   * @example
-   * const LowestHp = ForceMin(10)
-   * LowestHp(-1)     // => 10
-   * LowestHp(255)    // => 255
-   */
-  export const ForceMin = (min: number) => (x: number) => Math.max(min, x)
-
-  /** Returns a function that ensures some value is at most `max`.
-   *
-   * @param max The maximum value a number can be.
-   * @returns A function that accepts a number `x` and returns `x` or `max`.
-   *
-   * @example
-   * let MaxSpeed = ForceMax(1.7)
-   * MaxSpeed(2)     // => 1.7
-   * MaxSpeed(1.7)   // => 1.7
-   * MaxSpeed(0.5)   // => 0.5
-   *
-   * MaxSpeed = ForceMax(1)
-   * MaxSpeed(1.1)   // => 1
-   */
-  export const ForceMax = (max: number) => (x: number) => Math.min(max, x)
-
-  /** Returns a function that ensures some value is between the (inclusive) range [`min`..`max`].
-   *
-   * @param min The minimum value a number can be.
-   * @param max The maximum value a number can be.
-   * @returns A function that accepts a number `x` and makes sure it stays within `min` and `max`.
-   *
-   * @example
-   * const itemCount = 42
-   * let Take = ForceRange(0, itemCount)
-   * Take(-100)     // => 0
-   * Take(255)      // => 42
-   * Take(3)        // => 3
-   *
-   * // Redefine Take function to reflect new data
-   * Take = ForceRange(0, itemCount - Take(3))
-   */
-  export const ForceRange = (min: number, max: number) => (x: number) =>
-    ForceMin(min)(ForceMax(max)(x))
-
-  /** Ensures some value is always positive.
-   *
-   * @param x A number.
-   * @returns `0` if `x` is negative, else `x`.
-   *
-   * @example
-   * ForcePositive(-100)     // => 0
-   * ForcePositive(255)      // => 255
-   * ForcePositive(0)        // => 0
-   */
-  export const ForcePositive = (x: number) => ForceMin(0)(x)
-
-  /** Ensures some value always stays within the (inclusive) range [`0`..`1`].
-   *
-   * @param x A number.
-   * @returns A number between [`0`..`1`].
-   *
-   * @example
-   * ForcePercent(-0.1)       // => 0
-   * ForcePercent(10)         // => 1
-   * ForcePercent(0.5)        // => 0.5
-   */
-  export const ForcePercent = (x: number) => ForceRange(0, 1)(x)
-}
+export namespace MathLib {}
 
 /** Functions related to `Forms`. */
 export namespace FormLib {
