@@ -1,0 +1,22 @@
+Missing on Form
+    - getuniqueid
+    - itemtype
+    - objrefhasname
+    - persistentchest
+    - preserve
+
+Missing on Misc
+    - guid
+    - jcontainerstopreserving
+    - papyrusutiltopreserving
+    - preservevar
+    - trye
+    - wait
+
+Missing on Set
+    - intersection
+
+Missing on Time
+    - now
+    - types
+
