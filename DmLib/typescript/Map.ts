@@ -27,3 +27,20 @@ export function JoinMaps<K, V>(
  * @returns
  */
 export const joinMaps = JoinMaps
+
+/** Joins two maps, applying a function when keys collide.
+ *
+ * @param m1 First map.
+ * @param m2 Second map.
+ * @param OnExistingKey Function for solving collisions.
+ * @returns
+ */
+export const join = JoinMaps
+
+export function mapToArray<K, V>(m1: Map<K, V>) {
+  const r: [K, V][] = []
+  for (const k of m1) r.push(k)
+  return r
+}
+
+export const toArray = mapToArray
