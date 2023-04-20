@@ -40,6 +40,10 @@ export class Maybe<T> {
     return Maybe.noneToNull(this._value)
   }
 
+  get noneAsNull() {
+    return this.noneToNull()
+  }
+
   public static noneToUndefined<T>(value: T | null | undefined) {
     if (value === null || value === undefined) return undefined
     return value as T
@@ -49,6 +53,9 @@ export class Maybe<T> {
     return Maybe.noneToUndefined(this._value)
   }
 
+  get noneAsUndefined() {
+    return this.noneToUndefined()
+  }
   public static isNone<T>(value: T | null | undefined) {
     return value === null || value === undefined
   }
