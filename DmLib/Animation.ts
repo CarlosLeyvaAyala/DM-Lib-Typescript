@@ -47,6 +47,7 @@ export const enum Animations {
   IdleHammerCarpenterTableEnter = "IdleHammerCarpenterTableEnter",
   IdleLeanTableEnter = "IdleLeanTableEnter",
   IdleLooseSweepingStart = "idleLooseSweepingStart",
+  IdlePrayCrouchedEnter = "IdlePrayCrouchedEnter",
   IdleSharpeningWheelStart = "IdleSharpeningWheelStart",
   IdleSmelterEnter = "IdleSmelterEnter",
   IdleStop = "IdleStop",
