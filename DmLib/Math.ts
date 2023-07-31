@@ -94,8 +94,10 @@ export function CubicSpline(points: Point[]) {
   const n = points.length - 1
 
   // Avoid invalid number of points.
-  if (n == -1) return (x: number) => 0
+  if (n <= -1) return (x: number) => 0
   if (n == 0) return (x: number) => points[0].y
+  if (n === 1) return LinCurve(points[0], points[1])
+
   const sd = SecondDerivative(points)
 
   return (x: number) => {

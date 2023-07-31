@@ -86,3 +86,17 @@ export function waitActor(
   }
   f()
 }
+
+export function waitActorId(
+  formId: number,
+  time: number,
+  DoSomething: (act: Actor) => void
+) {
+  const f = async () => {
+    await Utility.wait(time)
+    const act = Actor.from(Game.getFormEx(formId))
+    if (!act) return
+    DoSomething(act)
+  }
+  f()
+}

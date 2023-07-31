@@ -500,3 +500,26 @@ export function getFormFromUniqueId(
   const formId = Number(m[formIdGroup])
   return Game.getFormFromFile(formId, esp)
 }
+
+/** Removes all the intstances of some item.
+ *
+ * @param o Who carries the item.
+ * @param itemToRemove Item to completely remove.
+ * @param silent Show a message?
+ * @param otherContainer Move the item to other container?
+ * @returns
+ */
+export function removeAllFromThisItem(
+  o: ObjectReference | null,
+  itemToRemove: Form | null,
+  silent: boolean = true,
+  otherContainer: ObjectReference | null = null
+) {
+  if (!o) return
+  o.removeItem(
+    itemToRemove,
+    o.getItemCount(itemToRemove),
+    silent,
+    otherContainer
+  )
+}
