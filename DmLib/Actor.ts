@@ -1,4 +1,12 @@
-import { Actor, Game, Keyword, ObjectReference, Utility } from "skyrimPlatform"
+import {
+  Actor,
+  ActorBase,
+  Game,
+  HeadPart,
+  Keyword,
+  ObjectReference,
+  Utility,
+} from "skyrimPlatform"
 import { preserveActor } from "./Form"
 
 /** Player FormId. */
@@ -99,4 +107,20 @@ export function waitActorId(
     DoSomething(act)
   }
   f()
+}
+
+export function getHeadPartsB(b: ActorBase | null) {
+  if (!b) return null
+  const r = new Array(b.getNumHeadParts())
+
+  for (let i = 0; i < r.length; i++) {
+    r[i] = b.getNthHeadPart(i)
+  }
+
+  return r
+}
+
+export function getHeadParts(a: Actor | null) {
+  if (!a) return null
+  return getHeadPartsB(ActorBase.from(a.getBaseObject()))
 }

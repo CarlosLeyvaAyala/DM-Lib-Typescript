@@ -11,7 +11,9 @@ export function RandomElement<T>(arr: T[]) {
 declare global {
   interface Array<T> {
     iter(action: (i: T) => void): Array<T>
-    // randomElement(): T
+    randomElement(): T
+    singleOrDefault(defaultValue: T): T
+    singleOrNull(): T | null
   }
 }
 
@@ -20,6 +22,14 @@ Array.prototype.iter = function <T>(action: (i: T) => void) {
   return this
 }
 
-// Array.prototype.randomElement = () => function <T>(): T {
-//     return RandomElement(this)
-// }
+Array.prototype.singleOrNull = function () {
+  return this.length < 1 ? null : this[0]
+}
+
+Array.prototype.singleOrDefault = function <T>(defaultValue: T) {
+  return this.singleOrNull ?? defaultValue
+}
+
+Array.prototype.randomElement = function <T>(): T {
+  return this[Math.floor(Math.random() * this.length)]
+}
