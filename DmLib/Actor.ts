@@ -1,6 +1,7 @@
 import {
   Actor,
   ActorBase,
+  Faction,
   Game,
   HeadPart,
   Keyword,
@@ -123,4 +124,10 @@ export function getHeadPartsB(b: ActorBase | null) {
 export function getHeadParts(a: Actor | null) {
   if (!a) return null
   return getHeadPartsB(ActorBase.from(a.getBaseObject()))
+}
+
+export function isCurrentFollower(a: Actor | null) {
+  //   const playerFollower = Faction.from(Game.getFormEx(0x84d1b))
+  const currentFollower = Faction.from(Game.getFormEx(0x5c84e))
+  return a?.isInFaction(currentFollower) ?? false
 }
