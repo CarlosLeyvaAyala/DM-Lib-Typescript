@@ -6,6 +6,7 @@ import {
   HeadPart,
   Keyword,
   ObjectReference,
+  Spell,
   Utility,
 } from "skyrimPlatform"
 import { preserveActor } from "./Form"
@@ -130,4 +131,15 @@ export function isCurrentFollower(a: Actor | null) {
   //   const playerFollower = Faction.from(Game.getFormEx(0x84d1b))
   const currentFollower = Faction.from(Game.getFormEx(0x5c84e))
   return a?.isInFaction(currentFollower) ?? false
+}
+
+export function getSpells(a: Actor | null) {
+  if (!a) return null
+  const n = a.getSpellCount()
+  const r: Spell[] = []
+  for (let i = 0; i < n; i++) {
+    const spell = a.getNthSpell(i)
+    if (spell) r.push(spell)
+  }
+  return r
 }
