@@ -60,6 +60,8 @@ export const enum Animations {
   JumpLand = "JumpLand",
   JumpLandDirectional = "JumpLandDirectional",
   JumpStandingStart = "JumpStandingStart",
+  MoveStart = "moveStart",
+  MoveStop = "moveStop",
   RitualSpellStart = "RitualSpellStart",
   SneakSprintStartRoll = "SneakSprintStartRoll",
   SneakStart = "SneakStart",
@@ -71,7 +73,7 @@ export const enum Animations {
   SprintStart = "SprintStart",
   SprintStop = "SprintStop",
   SwimStart = "SwimStart",
-  SwimStop = "SwimStop",
+  SwimStop = "swimStop",
   Unequip = "Unequip",
 }
 
@@ -83,7 +85,7 @@ export const enum Animations {
  */
 export function HookAnim(
   animName: string,
-  callback: () => void,
+  callback: (formId: number) => void,
   minFormId: number | undefined,
   maxFormId: number | undefined
 ) {
@@ -91,7 +93,7 @@ export function HookAnim(
     {
       enter(_) {},
       leave(c) {
-        if (c.animationSucceeded) once("update", () => callback())
+        if (c.animationSucceeded) once("update", () => callback(c.selfId))
       },
     },
     minFormId,
@@ -99,3 +101,11 @@ export function HookAnim(
     animName
   )
 }
+
+/** Adds a hook to react to some animation event.
+ * @param  {string} animName Name of the animation to react to.
+ * @param  {()=>void} callback Function to call when animation is played.
+ * @param  {number | undefined} minFormId Minimum FormId of actors to react to.
+ * @param  {number | undefined} maxFormId Maximum FormId of actors to react to.
+ */
+export const hookAnim = HookAnim
