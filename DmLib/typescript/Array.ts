@@ -42,14 +42,7 @@ Array.prototype.randomElement = function <T>(): T {
 Array.prototype.maxBy = function <T>(
   compare: (a: T, b: T) => number
 ): T | undefined {
-  switch (this.length) {
-    case 0:
-      return undefined
-    case 1:
-      return this[0]
-    default:
-      break
-  }
+  if (this.length === 0) return undefined
 
   let max = this[0]
   for (let i = 1; i < this.length; i++) {
@@ -63,14 +56,7 @@ Array.prototype.maxBy = function <T>(
 Array.prototype.minBy = function <T>(
   compare: (a: T, b: T) => number
 ): T | undefined {
-  switch (this.length) {
-    case 0:
-      return undefined
-    case 1:
-      return this[0]
-    default:
-      break
-  }
+  if (this.length === 0) return undefined
 
   let min = this[0]
   for (let i = 1; i < this.length; i++) {
