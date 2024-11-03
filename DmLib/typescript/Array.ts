@@ -7,6 +7,9 @@ export function RandomElement<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
+export const fst = <A, B>(tuple: [A, B]) => tuple[0]
+export const snd = <A, B>(tuple: [A, B]) => tuple[1]
+
 /** Extend array */
 declare global {
   interface Array<T> {
@@ -14,7 +17,8 @@ declare global {
     randomElement(): T
     singleOrDefault(defaultValue: T): T
     singleOrNull(): T | null
-    maxBy(compare: (a: T, b: T) => number): T
+    maxBy(compare: (a: T, b: T) => number): T | undefined
+    minBy(compare: (a: T, b: T) => number): T | undefined
   }
 }
 
@@ -35,7 +39,18 @@ Array.prototype.randomElement = function <T>(): T {
   return this[Math.floor(Math.random() * this.length)]
 }
 
-Array.prototype.maxBy = function <T>(compare: (a: T, b: T) => number): T {
+Array.prototype.maxBy = function <T>(
+  compare: (a: T, b: T) => number
+): T | undefined {
+  switch (this.length) {
+    case 0:
+      return undefined
+    case 1:
+      return this[0]
+    default:
+      break
+  }
+
   let max = this[0]
   for (let i = 1; i < this.length; i++) {
     const t = this[i]
@@ -43,4 +58,25 @@ Array.prototype.maxBy = function <T>(compare: (a: T, b: T) => number): T {
     max = c >= 0 ? max : t
   }
   return max
+}
+
+Array.prototype.minBy = function <T>(
+  compare: (a: T, b: T) => number
+): T | undefined {
+  switch (this.length) {
+    case 0:
+      return undefined
+    case 1:
+      return this[0]
+    default:
+      break
+  }
+
+  let min = this[0]
+  for (let i = 1; i < this.length; i++) {
+    const t = this[i]
+    const c = compare(min, t)
+    min = c <= 0 ? min : t
+  }
+  return min
 }

@@ -44,3 +44,30 @@ export function mapToArray<K, V>(m1: Map<K, V>) {
 }
 
 export const toArray = mapToArray
+
+/** Extend set */
+declare global {
+  interface Map<K, V> {
+    filter(predicate: (value: V, key: K) => boolean): Map<K, V>
+    map<K, V, V2>(mapper: (value: V, key: K) => V2): Map<K, V2>
+    toArray(): [K, V][]
+  }
+}
+
+Map.prototype.filter = function <K, V>(predicate: (value: V, key: K) => boolean) {
+  const r = new Map<K, V>()
+  this.forEach((v, k) => { if (predicate(v, k)) r.set(k, v) })
+  return r
+}
+
+Map.prototype.toArray = function () {
+  return mapToArray(this)
+}
+
+Map.prototype.map = function <K, V, V2>(mapper: (value: V, key: K) => V2) {
+  const a: [K, V2][] = []
+  const r = new Map<K, V2>()
+  this.forEach((v, k) => a.push([k, mapper(v, k)]))
+  a.iter(([k, v]) => r.set(k, v))
+  return r
+}
